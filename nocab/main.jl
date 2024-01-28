@@ -1,8 +1,9 @@
 include("FileReaders/FileReader.jl")
 
 function main()
-    result = Nocab.getAllTextInFile("nocab.txt")
-    print(result)
+    Nocab.readProcessWrite("nocab.txt", "output.txt")
+    # result = Nocab.getAllTextInFile("nocab.txt")
+    # print(result)
 end #function main()
 
 main()
