@@ -71,7 +71,9 @@ function embed(embedder::Embedder, text::String)
     else
         error("Not-Bert models are not yet supported.")
     end
-    return embedding
+    # convert from Matrix{Float32} to Vector{Float32} to ensure compatability
+    # with LinearAlgebra library
+    return vec(embedding)
 end
 
 
