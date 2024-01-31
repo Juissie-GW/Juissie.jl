@@ -94,7 +94,7 @@ return : cls_embedding
 function embed_from_bert(embedder::Embedder, text::String)
     encoded_input = encode(embedder.tokenizer, text)
     model_output = embedder.model(encoded_input)
-    cls_embedding = model_output.hidden_state[:, 1, :]
+    cls_embedding = model_output.hidden_state[:, 1, :] # Grab the 1st item in the 2nd Dimention
     return cls_embedding
 end # function embed_from_bert
 

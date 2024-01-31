@@ -9,6 +9,10 @@ T0DO. Detailed guides to be added in the `setup` directory.
 
 - Code should be documented. I am partial to numpydoc-style docstrings, but those are obviously Python-oriented (though they seem adequate for Julia, too)
 
+## External Dependency/ Libraries
+
+Transformers Julia Package
+https://www.juliapackages.com/p/transformers
 
 ## Contributors: 
 - Arthur Bacon
