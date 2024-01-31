@@ -1,5 +1,14 @@
 # csci_6221
 George Washington University class CSCI 6221 Advanced Software Paradigms: Julia project
 
-Contributors: 
+## Setup
+
+T0DO. Detailed guides to be added in the `setup` directory.
+
+## Norms
+
+- Code should be documented. I am partial to numpydoc-style docstrings, but those are obviously Python-oriented (though they seem adequate for Julia, too)
+
+
+## Contributors: 
 - Arthur Bacon
