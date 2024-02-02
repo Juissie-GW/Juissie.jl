@@ -9,8 +9,15 @@ using DataFrames
 
 include("Embedding.jl")
 using .Embedding
+include("TextUtils.jl")
+using .Textutils
 
-export Corpus
+export (
+    Corpus, 
+    upsert_chunk, 
+    upsert_document,
+    search
+)
 
 """
     struct Corpus
@@ -28,6 +35,7 @@ mutable struct Corpus
     db
     hnsw
     embedder
+    max_seq_len
     data
     next_idx
 end
@@ -45,7 +53,7 @@ In particular, does the following:
 - chunk text 
 We can add more metadata later, if desired
 """
-function Corpus(corpus_name::String=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5")
+function Corpus(corpus_name::String=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5", max_seq_len::Int=512)
     # initialize embedder
     embedder = Embedder(embedder_model_path)
 
@@ -67,7 +75,7 @@ function Corpus(corpus_name::String=nothing, embedder_model_path::String="BAAI/b
 
     # don't initialize hnsw yet because it needs initial features
     hnsw = nothing
-    return Corpus(db, hnsw, embedder, [], 1)
+    return Corpus(db, hnsw, embedder, max_seq_len, [], 1)
 end
 
 """
@@ -113,6 +121,24 @@ function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
     )
 
     corpus.next_idx += 1;
+end
+
+"""
+    function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
+
+Upsert a whole document (i.e., long string).
+Does so by splitting the document into appropriately-sized chunks so no chunk exceeds
+the embedder's tokenization max sequence length, while prioritizing sentence endings.
+"""
+function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
+    chunks = chunkify(
+        doc_text, 
+        corpus.embedder.tokenizer, 
+        corpus.max_seq_len
+    )
+    for chunk in chunks
+        upsert_chunk(corpus, chunk, doc_name)
+    end
 end
 
 """
