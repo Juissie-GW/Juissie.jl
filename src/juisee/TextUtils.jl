@@ -10,7 +10,12 @@ export chunkify
 """
     function sentence_splitter(text::String)
 
-Divides a provided text (e.g. paragraph) into sentences.
+Uses basic regex to divide a provided text (e.g. paragraph) into sentences.
+
+Parameters
+----------
+text : String
+    The text you want to split into sentences.
 """
 function sentence_splitter(text::String)
     regex = r"(?<=[.!?])\s+|\Z"
@@ -24,6 +29,16 @@ end
 Splits a provided text (e.g. paragraph) into chunks that are each as many sentences
 as possible while keeping the chunk's token lenght below the sequence_length.
 This ensures that each chunk can be fully encoded by the embedder.
+
+Parameters
+----------
+text : String
+    The text you want to split into chunks.
+tokenizer : a tokenizer object, e.g. BertTextEncoder
+    The tokenizer you will be using
+sequence_length : Int
+    The maximum number of tokens per chunk.
+    Ideally, should correspond to the max sequence length of the tokenizer
 """
 function chunkify(text::String, tokenizer, sequence_length::Int=512)
     sentences = sentence_splitter(text)
