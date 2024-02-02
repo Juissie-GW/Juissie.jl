@@ -134,8 +134,6 @@ end
 
 Performs approximate nearest neighbor search to find the items in the vector
 index closest to the query.
-
-TODO add the SQL query to make this return the actual chunks and doc names
 """
 function search(corpus::Corpus, query::String, k::Int=5)
     if isnothing(corpus.hnsw)
