@@ -22,3 +22,6 @@ docs/site/
 # committed for packages, but should be committed for applications that require a static
 # environment.
 Manifest.toml
+
+# mac-only: stores custom attributes of folders
+.DS_Store 
