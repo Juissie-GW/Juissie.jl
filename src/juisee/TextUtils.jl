@@ -39,6 +39,21 @@ tokenizer : a tokenizer object, e.g. BertTextEncoder
 sequence_length : Int
     The maximum number of tokens per chunk.
     Ideally, should correspond to the max sequence length of the tokenizer
+
+Example Usage
+-------------
+    >>> chunkify(
+        '''Hold me closer, tiny dancer. Count the headlights on the highway. Lay me down in sheets of linen. Peter Piper picked a peck of pickled peppers. A peck of pickled peppers Peter Piper picked.
+        ''', 
+        corpus.embedder.tokenizer, 
+        20
+    )
+
+    4-element Vector{Any}:
+    "Hold me closer, tiny dancer. Count the headlights on the highway."
+    "Lay me down in sheets of linen."
+    "Peter Piper picked a peck of pickled peppers."
+    "A peck of pickled peppers Peter Piper picked."
 """
 function chunkify(text::String, tokenizer, sequence_length::Int=512)
     sentences = sentence_splitter(text)

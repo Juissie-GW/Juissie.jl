@@ -10,14 +10,10 @@ using DataFrames
 include("Embedding.jl")
 using .Embedding
 include("TextUtils.jl")
-using .Textutils
+using .TextUtils
 
-export (
-    Corpus, 
-    upsert_chunk, 
-    upsert_document,
-    search
-)
+
+export Corpus, upsert_chunk, upsert_document, search
 
 """
     struct Corpus
@@ -30,6 +26,23 @@ Basically a vector database. It will have these attributes:
 Attributes
 ----------
 db : a SQLite.DB connection object
+    this is a real relational database to store metadata (e.g. chunk text, doc name)
+hnsw : Hierarchical Navigable Small World object
+    this is our searchable vector index
+embedder : Embedder
+    an initialized Embedder struct
+max_seq_len : int
+    The maximum number of tokens per chunk.
+    This should be the max sequence length of the tokenizer
+data : Vector{Any}
+    The embeddings get stored here before we create the vector index
+next_idx : int
+    stores the index we'll use for the next-upserted chunk
+
+Notes
+-----
+The struct is mutable because we want to be able to change things like
+incrementing next_idx.
 """
 mutable struct Corpus
     db
@@ -52,14 +65,26 @@ In particular, does the following:
 - doc_name representing the *parent* document
 - chunk text 
 We can add more metadata later, if desired
+
+Parameters
+----------
+corpus_name : str or nothing
+    the name that you want to give the database
+    optional. if left as nothing, we use an in-memory database
+embedder_model_path : str
+    a path to a HuggingFace-hosted model
+    e.g. "BAAI/bge-small-en-v1.5"
+max_seq_len : int
+    The maximum number of tokens per chunk.
+    This should be the max sequence length of the tokenizer
 """
-function Corpus(corpus_name::String=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5", max_seq_len::Int=512)
+function Corpus(corpus_name::Union{String, Nothing}=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5", max_seq_len::Int=512)
     # initialize embedder
     embedder = Embedder(embedder_model_path)
 
     # initialize database
     if isnothing(corpus_name)
-        db = SQLite.DB # in-memory db
+        db = SQLite.DB() # in-memory db
     else
         db = SQLite.DB("$(corpus_name).db")
     end
@@ -99,6 +124,17 @@ Process:
 3. Insert metadata into database
 4. Increment idx counter
 
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+chunk : str
+    This is the text content of the chunk you want to upsert
+doc_name : str
+    The name of the document that chunk is from. For instance, if you 
+    were upserting all the chunks in an academic paper, doc_name might
+    be the name of that paper
+
 Notes
 -----
 If the vectors have been indexed, this de-indexes them (i.e., they need
@@ -129,6 +165,16 @@ end
 Upsert a whole document (i.e., long string).
 Does so by splitting the document into appropriately-sized chunks so no chunk exceeds
 the embedder's tokenization max sequence length, while prioritizing sentence endings.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+doc_text : str
+    A long string you want to upsert. We will break this into chunks and
+    upsert each chunk.
+doc_name : str
+    The name of the document the content is from
 """
 function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
     chunks = chunkify(
@@ -146,6 +192,11 @@ end
 
 Constructs the HNSW vector index from the data available.
 Must be run before searching.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
 """
 function index(corpus::Corpus)
     corpus.hnsw = HierarchicalNSW(
@@ -160,6 +211,16 @@ end
 
 Performs approximate nearest neighbor search to find the items in the vector
 index closest to the query.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+query : str
+    The text you want to search, e.g. your question
+    We embed this and perform semantic retrieval against the vector db
+k : int
+    The number of nearest-neighbor vectors to fetch
 """
 function search(corpus::Corpus, query::String, k::Int=5)
     if isnothing(corpus.hnsw)
