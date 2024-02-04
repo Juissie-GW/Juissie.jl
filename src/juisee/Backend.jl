@@ -45,12 +45,12 @@ The struct is mutable because we want to be able to change things like
 incrementing next_idx.
 """
 mutable struct Corpus
-    db
-    hnsw
-    embedder
-    max_seq_len
-    data
-    next_idx
+    db :: SQLite.DB
+    hnsw :: Union{HNSW.HierarchicalNSW, Nothing}
+    embedder :: Embedding.Embedder
+    max_seq_len :: Int64
+    data :: Vector{Any}
+    next_idx :: Int64
 end
 
 """
@@ -138,7 +138,8 @@ doc_name : str
 Notes
 -----
 If the vectors have been indexed, this de-indexes them (i.e., they need
-to be indexed again).
+to be indexed again). Currentoy, we handle this by setting hnsw to 
+nothing so that it gets caught later in search.
 """
 function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
     if !isnothing(corpus.hnsw)
