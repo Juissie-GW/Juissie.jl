@@ -23,6 +23,11 @@ docs/site/
 # environment.
 Manifest.toml
 
+<<<<<<< HEAD
 tmp/*
 !tmp/README.md
 nocab/*
+=======
+# mac-only: stores custom attributes of folders
+.DS_Store 
+>>>>>>> origin/main
