@@ -13,7 +13,7 @@ export Embedder, embed
 
 Attributes
 ----------
-tokenizer : an tokenizer object, e.g. BertTextEncoder
+tokenizer : a tokenizer object, e.g. BertTextEncoder
     maps your string to tokens the model can understand
 model : a model object, e.g. HGFBertModel
     the actual model architecture and weights to perform inference with
