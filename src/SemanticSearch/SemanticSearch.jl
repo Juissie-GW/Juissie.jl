@@ -7,8 +7,13 @@ include("Backend.jl")
 include("Embedding.jl")
 include("TextUtils.jl")
 
-export Corpus, upsert_chunk, upsert_document, search,
-    Embedder, embed,
-    chunkify
+using .Backend
+export Corpus, upsert_chunk, upsert_document, search
+
+using .Embedding
+export Embedder, embed,
+
+using .TextUtils
+export chunkify
 
 end
