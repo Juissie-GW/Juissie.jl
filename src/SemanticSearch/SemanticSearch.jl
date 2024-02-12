@@ -11,7 +11,7 @@ using .Backend
 export Corpus, upsert_chunk, upsert_document, search
 
 using .Embedding
-export Embedder, embed,
+export Embedder, embed
 
 using .TextUtils
 export chunkify
