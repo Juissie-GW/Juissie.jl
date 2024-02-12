@@ -1,0 +1,12 @@
+name = "Juissie"
+uuid = "d87d79c4-7fb2-4087-a91e-b4c4d91349d0"
+authors = ["Lucas H. McCabe <lucasmccabe@gwu.edu>", "Arthur Bacon <arthurbacon@nocabsoftware.com>", "Alexey Iakovenko <alexey@iakovenko.com>", "Artin Yousefi <arthurbacon@nocabsoftware.com>"]
+version = "0.0.1"
+
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+HNSW = "540f64fa-c57e-11e8-081c-41422cda4629"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
+Transformers = "21ca0261-441d-5938-ace7-c90938fde4d4"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
