@@ -45,7 +45,7 @@ upsert_chunk(corpus, "Peter Piper picked a peck of pickled peppers. A peck of pi
 Search those chunks:
 
 ```julia
-idx_list, doc_names, chunks, distances = Backend.search(
+idx_list, doc_names, chunks, distances = search(
     corpus, 
     "tiny dancer", 
     2
