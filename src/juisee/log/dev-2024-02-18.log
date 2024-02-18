@@ -1,0 +1,25 @@
+┌ Info: 2024-02-18 00:35:03 Watching ["C:\\Users\\GW\\Documents\\main\\csci_6221\\src\\juisee"]
+└ @ GenieAutoReload C:\Users\GW\.julia\packages\GenieAutoReload\ESvsh\src\GenieAutoReload.jl:19
+┌ Info: 2024-02-18 00:35:37 
+│ Web Server starting at http://127.0.0.1:8000 
+└ @ Genie.Server C:\Users\GW\.julia\packages\Genie\KiJgQ\src\Server.jl:166
+┌ Info: 2024-02-18 00:35:40 Listening on: 127.0.0.1:8000, thread id: 1
+└ @ HTTP.Servers C:\Users\GW\.julia\packages\HTTP\1EWL3\src\Servers.jl:369
+┌ Info: 2024-02-18 00:36:02 Searching for tiny
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:35
+┌ Info: 2024-02-18 00:36:04 value of Any[1, 3], Any["doc1", "doc2"], Any["Hold me closer, tiny dancer.", "Lay me down in sheets of linen."], Any[Float32[7.273045, 9.306661]]
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:44
+┌ Info: 2024-02-18 00:36:13 Searching for cout
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:35
+┌ Info: 2024-02-18 00:36:13 value of Any[3, 1], Any["doc2", "doc1"], Any["Lay me down in sheets of linen.", "Hold me closer, tiny dancer."], Any[Float32[9.076627, 9.221763]]
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:44
+┌ Info: 2024-02-18 00:36:20 Searching for count
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:35
+┌ Info: 2024-02-18 00:36:20 value of Any[2, 3], Any["doc1", "doc2"], Any["Count the headlights on the highway.", "Lay me down in sheets of linen."], Any[Float32[7.9301066, 8.854981]]
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:44
+┌ Info: 2024-02-18 00:39:56 Autoreloading
+└ @ GenieAutoReload C:\Users\GW\.julia\packages\GenieAutoReload\ESvsh\src\GenieAutoReload.jl:22
+┌ Info: 2024-02-18 00:40:02 Searching for count
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:35
+┌ Info: 2024-02-18 00:40:03 value of Any[2, 3], Any["doc1", "doc2"], Any["Count the headlights on the highway.", "Lay me down in sheets of linen."], Any[Float32[7.9301066, 8.854981]]
+└ @ Main.Frontend C:\Users\GW\Documents\main\csci_6221\src\juisee\app.jl:44

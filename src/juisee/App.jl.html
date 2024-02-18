@@ -1,0 +1,21 @@
+<h2 style="text-align:center;">CSCI - 6221 - Julia Team Demo</h2>
+    <br><br>
+<div style="display:flex; justify-content:center;">
+    <q-card style="width:500px;">
+        <br>
+        <q-input style="padding-left:20px;padding-right:20px; width:500px; text-align:center;" label="Type something..." v-model="search"></q-input>
+        <div style="display:flex; justify-content:center; padding-top:10px; padding-bottom:10px;">
+            <q-btn color="secondary" label="Search!" :loading="button_pressed" v-on:click="userinput = !userinput"></q-btn>
+        </div>
+    </q-card>
+</div>
+    <div style="display:flex; justify-content:center; margin-top:20px;">
+        <q-card style="width:1000px; padding:20px; background-color:white;">
+            <h5>Results:</h5>
+            <p v-text="idx_list">{{idx_list}}</p>
+            <p v-text="doc_names">{{doc_names}}</p>
+            <p v-text="chunks">{{chunks}}</p>
+            <p v-text="distances">{{distances}}</p>
+        </q-card>
+    </div>
+    
