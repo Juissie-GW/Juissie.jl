@@ -1,5 +1,6 @@
-# csci_6221
-George Washington University class CSCI 6221 Advanced Software Paradigms: Julia project
+# JUISSIE (JUlIa Semantic Search pIpelinE)
+
+Herin we provide, to our knowledge, the first open source pure-Julia semantic query engine.
 
 ## Getting Started
 
@@ -7,17 +8,20 @@ Setup guides can be found in the `guides` directory. For quickstart, see `guides
 
 Walkthroughs of module basic usage will be added to the `notebooks` directory as needed, as well.
 
-## Norms
+## External Dependencies
 
-- Code should be documented. I am partial to numpydoc-style docstrings, but those are obviously Python-oriented (though they seem adequate for Julia, too)
-
-## External Dependency/ Libraries
-
-Transformers Julia Package
-https://www.juliapackages.com/p/transformers
+We make use of several pre-existing open source Julia packages. These found in `Project.toml`, but we enumerate them here, as well, for convenience:
+- DataFrames
+- HNSW
+- JSON
+- LinearAlgebra
+- SQLite
+- Serialization
+- Transformers
+- UUIDs
 
 ## Questions? Reach out to our team:
-- Lucas H. McCabe ([@lucasmccabe](https://github.com/lucasmccabe))
-- Arthur Bacon ([@toon-leader-bacon](https://github.com/toon-leader-bacon)) ArthurBacon@NocabSoftware.com
-- Alexey Iakovenko ([@AlexeyIakovenko](https://github.com/AlexeyIakovenko))
-- Artin Yousefi ([@ArtinYousefi](https://github.com/ArtinYousefi))
+- Lucas H. McCabe ([@lucasmccabe](https://github.com/lucasmccabe), [email](mailto:lucasmccabe@gwu.edu))
+- Arthur Bacon ([@toon-leader-bacon](https://github.com/toon-leader-bacon), [email](mailto:ArthurBacon@NocabSoftware.com))
+- Alexey Iakovenko ([@AlexeyIakovenko](https://github.com/AlexeyIakovenko), [email](mailto:alexey@iakovenko.com))
+- Artin Yousefi ([@ArtinYousefi](https://github.com/ArtinYousefi), [email](mailto:artinyousefi@gwmail.gwu.edu))
