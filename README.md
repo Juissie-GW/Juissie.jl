@@ -3,7 +3,7 @@ George Washington University class CSCI 6221 Advanced Software Paradigms: Julia 
 
 ## Getting Started
 
-Guides will be added in the `setup` directory as needed.
+Setup guides can be found in the `guides` directory. For quickstart, see `guides/setup.md`.
 
 Walkthroughs of module basic usage will be added to the `notebooks` directory as needed, as well.
 
