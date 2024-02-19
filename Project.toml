@@ -1,6 +1,6 @@
 name = "Juissie"
 uuid = "d87d79c4-7fb2-4087-a91e-b4c4d91349d0"
-authors = ["Lucas H. McCabe <lucasmccabe@gwu.edu>", "Arthur Bacon <arthurbacon@nocabsoftware.com>", "Alexey Iakovenko <alexey@iakovenko.com>", "Artin Yousefi <arthurbacon@nocabsoftware.com>"]
+authors = ["Lucas H. McCabe <lucasmccabe@gwu.edu>", "Arthur Bacon <arthurbacon@nocabsoftware.com>", "Alexey Iakovenko <alexey@iakovenko.com>", "Artin Yousefi <artinyousefi@gwmail.gwu.edu>"]
 version = "0.0.1"
 
 [deps]
