@@ -11,8 +11,13 @@ Walkthroughs of module basic usage will be added to the `notebooks` directory as
 
 - Code should be documented. I am partial to numpydoc-style docstrings, but those are obviously Python-oriented (though they seem adequate for Julia, too)
 
+## External Dependency/ Libraries
+
+Transformers Julia Package
+https://www.juliapackages.com/p/transformers
+
 ## Questions? Reach out to our team:
 - Lucas H. McCabe ([@lucasmccabe](https://github.com/lucasmccabe))
-- Arthur Bacon ([@toon-leader-bacon](https://github.com/toon-leader-bacon))
+- Arthur Bacon ([@toon-leader-bacon](https://github.com/toon-leader-bacon)) ArthurBacon@NocabSoftware.com
 - Alexey Iakovenko ([@AlexeyIakovenko](https://github.com/AlexeyIakovenko))
 - Artin Yousefi ([@ArtinYousefi](https://github.com/ArtinYousefi))

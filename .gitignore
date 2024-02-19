@@ -23,5 +23,9 @@ docs/site/
 # environment.
 Manifest.toml
 
+tmp/*
+!tmp/README.md
+nocab/*
+
 # mac-only: stores custom attributes of folders
 .DS_Store 
