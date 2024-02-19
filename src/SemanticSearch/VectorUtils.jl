@@ -23,4 +23,6 @@ Higher values = vectors are more cosine_similar
 """
 function cosine_similarity(vec1, vec2)
     dot(vec1, vec2) / (norm(vec1) * norm(vec2))
-end
+end # function cosine_similarity(vec1, vec2)
+
+end # module VectorUtils

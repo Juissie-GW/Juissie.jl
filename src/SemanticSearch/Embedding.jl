@@ -26,7 +26,7 @@ functions that operate on that struct.
 struct Embedder
     tokenizer
     model
-end
+end # struct Embedder
 
 
 """Function to initialize an Embedder struct from a HuggingFace
@@ -45,7 +45,7 @@ This is sort of like a constructor in Python.
 function Embedder(model_name::String)
     tokenizer, model = load_hgf_pretrained(model_name)
     return Embedder(tokenizer, model)
-end
+end # function Embedder
 
 
 """Embeds a textual sequence using a provided model
@@ -64,7 +64,7 @@ This is sort of like a class method for the Embedder
 Julia has something called multiple dispatch that can be used to 
 make this cleaner, but I'm going to handle that at a later times
 """
-function embed(embedder::Embedder, text::String)
+function embed(embedder::Embedder, text::String)::AbstractVector
     if embedder.model isa Transformers.HuggingFace.HGFBertModel
         # if the model is a bert model, direct to bert-specific Function
         embedding = embed_from_bert(embedder, text)
@@ -74,7 +74,7 @@ function embed(embedder::Embedder, text::String)
     # convert from Matrix{Float32} to Vector{Float32} to ensure compatability
     # with LinearAlgebra library
     return vec(embedding)
-end
+end # function embed
 
 
 """Embeds a textual sequence using a provided Bert model
@@ -86,12 +86,16 @@ embedder : Embedder
     the associated model and tokenizer should be Bert-specific
 text : String
     the text sequence you want to embed
+
+return : cls_embedding
+    The results from passing the text through the encoder, throught the model,
+    and after stripping 
 """
 function embed_from_bert(embedder::Embedder, text::String)
     encoded_input = encode(embedder.tokenizer, text)
     model_output = embedder.model(encoded_input)
-    cls_embedding = model_output.hidden_state[:, 1, :]
+    cls_embedding = model_output.hidden_state[:, 1, :] # Grab the 1st item in the 2nd Dimention
     return cls_embedding
-end
+end # function embed_from_bert
 
-end # this ends the module
+end # module Embedding
