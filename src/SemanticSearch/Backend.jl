@@ -164,11 +164,11 @@ function load_corpus(corpus_name::String)
         embedder_model_path = corpus_data["embedder_model_path"]
         embedder = Embedder(embedder_model_path)
         max_seq_len = corpus_data["max_seq_len"]
+        
+        return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
     catch e
         throw(ArgumentError("Loading failed; corpus name not found."))
     end
-    
-    return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
 end
 
 """
