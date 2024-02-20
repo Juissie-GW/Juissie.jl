@@ -1,6 +1,6 @@
 # JUISSIE (JUlIa Semantic Search pIpelinE)
 
-Herin we provide, to our knowledge, the first open source pure-Julia semantic query engine.
+Herein we provide, to our knowledge, the first open source pure-Julia semantic query engine.
 
 ## Getting Started
 
