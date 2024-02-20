@@ -96,8 +96,18 @@ function Corpus(corpus_name::Union{String, Nothing}=nothing, embedder_model_path
     else
         db_path = "$(CURR_DIR)/files/$(corpus_name).db"
         if isfile(db_path)
-            # file exists ; delete it
-            rm(db_path) 
+            # file exists
+            @warn "A corpus by this name already exists. Do you want to proceed? Doing so will overwrite the existing corpus artifacts. [y/n]"
+            user_input = readline()
+            if user_input == "y"
+                # delete it
+                rm(db_path) 
+            elseif user_input == "n"
+                println("Corpus creation failed; try a different corpus name.")
+                return
+            else
+                println("Invalid input. Please enter 'y' for yes or 'n' for no.")
+            end 
         end
         db = SQLite.DB(db_path)
     end
@@ -167,7 +177,11 @@ function load_corpus(corpus_name::String)
         
         return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
     catch e
-        throw(ArgumentError("Loading failed; corpus name not found.\n" + e.msg))
+        if hasproperty(e, :msg)
+            throw(ArgumentError("Loading failed; corpus name not found.\n" + e.msg))
+        else
+            throw(ArgumentError("Loading failed; corpus name not found."))
+        end
     end
 end
 
