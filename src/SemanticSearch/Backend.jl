@@ -167,7 +167,7 @@ function load_corpus(corpus_name::String)
         
         return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
     catch e
-        throw(ArgumentError("Loading failed; corpus name not found."))
+        throw(ArgumentError("Loading failed; corpus name not found.\n" + e.msg))
     end
 end
 
