@@ -32,3 +32,6 @@ nocab/*
 
 # Environment variables, e.g. auth tokens
 .env
+
+# notebook checkpoints
+.ipynb_checkpoints/
