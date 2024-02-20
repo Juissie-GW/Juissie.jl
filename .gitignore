@@ -29,3 +29,6 @@ nocab/*
 
 # mac-only: stores custom attributes of folders
 .DS_Store 
+
+# Environment variables, e.g. auth tokens
+.env
