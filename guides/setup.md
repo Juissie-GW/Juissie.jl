@@ -7,6 +7,8 @@
 cd csci_6221
 ```
 
+In general, we assume the user is running `julia` other other commands (e.g., `jupyter notebook`) from the root level of this project.
+
 3. Open the Julia REPL by typing 'julia' into the terminal. Then, install the package dependencies:
 
 ```julia
