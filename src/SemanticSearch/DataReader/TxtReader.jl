@@ -1,6 +1,6 @@
 module TxtReader
 
-export getAllTextInFile, 
+export getAllTextInFile
 
 
 """
@@ -109,3 +109,5 @@ function appendToFile(filename::String, contents::String)::Bool
     end # try
     return false
 end # function appendToFile(filename::String, contents::String)::Bool
+
+end # module TxtReader

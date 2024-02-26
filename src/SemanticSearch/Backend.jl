@@ -15,11 +15,18 @@ include("TextUtils.jl")
 using .TextUtils
 include("DataReader/PdfReader.jl")
 using .PdfReader
+include("DataReader/TxtReader.jl")
+using .TxtReader
 
 CURR_DIR = @__DIR__
 
-export Corpus, upsert_chunk, upsert_document, upsert_pdf_document,
-    search, load_corpus
+export Corpus,
+    upsert_chunk,
+    upsert_document,
+    upsert_pdf_document,
+    upsert_txt_document,
+    search,
+    load_corpus
 
 """
     struct Corpus
@@ -300,9 +307,44 @@ function upsert_document(corpus::Corpus, documents::Vector{String}, doc_name::St
     end
 end
 
+"""
+    function upsert_pdf_document(corpus::Corpus, filePath::String, doc_name::String)
+
+Upsert all the data in a PDF file into the provided corpus.
+See the upsert_document(...) above for more details.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+filePath : String
+    The path to the PDF file to read
+doc_name : str
+    The name of the document the content is from
+"""
 function upsert_pdf_document(corpus::Corpus, filePath::String, doc_name::String)
     upsert_document(corpus,
         PdfReader.getAllTextInPDF(filePath),
+        doc_name)
+end
+
+"""
+    function upsert_txt_document(corpus::Corpus, filePath::String, doc_name::String)
+
+Upsert all the data from the text file into the provided corpus.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+filePath : String
+    The path to the txt file to read
+doc_name : str
+    The name of the document the content is from
+"""
+function upsert_txt_document(corpus::Corpus, filePath::String, doc_name::String)
+    upsert_document(corpus,
+        TxtReader.getAllTextInFile(filePath),
         doc_name)
 end
 

@@ -8,7 +8,7 @@ include("Embedding.jl")
 include("TextUtils.jl")
 
 using .Backend
-export Corpus, upsert_chunk, upsert_document, upsert_pdf_document, 
+export Corpus, upsert_chunk, upsert_document, upsert_pdf_document, upsert_txt_document, 
     search, load_corpus
 
 using .Embedding
