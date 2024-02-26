@@ -4,7 +4,7 @@ include("SemanticSearch/SemanticSearch.jl")
 include("Generation.jl")
 
 using .SemanticSearch
-export Corpus, upsert_chunk, upsert_document, search,
+export Corpus, upsert_chunk, upsert_document, upsert_pdf_document, search,
     Embedder, embed, load_corpus
 
 using .Generation
