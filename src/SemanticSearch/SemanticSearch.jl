@@ -11,8 +11,8 @@ using .Backend
 export Corpus, 
         upsert_chunk, 
         upsert_document, 
-        upsert_pdf_document, 
-        upsert_txt_document, 
+        upsert_document_from_pdf, 
+        upsert_document_from_txt, 
         search, 
         load_corpus
 

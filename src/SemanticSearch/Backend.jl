@@ -23,8 +23,8 @@ CURR_DIR = @__DIR__
 export Corpus,
     upsert_chunk,
     upsert_document,
-    upsert_pdf_document,
-    upsert_txt_document,
+    upsert_document_from_pdf,
+    upsert_document_from_txt,
     search,
     load_corpus
 
@@ -308,7 +308,7 @@ function upsert_document(corpus::Corpus, documents::Vector{String}, doc_name::St
 end
 
 """
-    function upsert_pdf_document(corpus::Corpus, filePath::String, doc_name::String)
+    function upsert_document_from_pdf(corpus::Corpus, filePath::String, doc_name::String)
 
 Upsert all the data in a PDF file into the provided corpus.
 See the upsert_document(...) above for more details.
@@ -322,14 +322,14 @@ filePath : String
 doc_name : str
     The name of the document the content is from
 """
-function upsert_pdf_document(corpus::Corpus, filePath::String, doc_name::String)
+function upsert_document_from_pdf(corpus::Corpus, filePath::String, doc_name::String)
     upsert_document(corpus,
         PdfReader.getAllTextInPDF(filePath),
         doc_name)
 end
 
 """
-    function upsert_txt_document(corpus::Corpus, filePath::String, doc_name::String)
+    function upsert_document_from_txt(corpus::Corpus, filePath::String, doc_name::String)
 
 Upsert all the data from the text file into the provided corpus.
 
@@ -342,7 +342,7 @@ filePath : String
 doc_name : str
     The name of the document the content is from
 """
-function upsert_txt_document(corpus::Corpus, filePath::String, doc_name::String)
+function upsert_document_from_txt(corpus::Corpus, filePath::String, doc_name::String)
     upsert_document(corpus,
         TxtReader.getAllTextInFile(filePath),
         doc_name)
