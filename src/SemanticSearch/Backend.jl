@@ -16,7 +16,12 @@ using .TextUtils
 
 CURR_DIR = @__DIR__
 
-export Corpus, upsert_chunk, upsert_document, search, load_corpus
+export Corpus, 
+    upsert_chunk, 
+    upsert_document, 
+    upsert_document_from_url, 
+    search, 
+    load_corpus
 
 """
     struct Corpus
@@ -268,6 +273,29 @@ function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
     for chunk in chunks
         upsert_chunk(corpus, chunk, doc_name)
     end
+end
+
+"""
+    function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
+
+Upsert a whole document (i.e., long string).
+Does so by splitting the document into appropriately-sized chunks so no chunk exceeds
+the embedder's tokenization max sequence length, while prioritizing sentence endings.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+url : String
+    The url you want to scrape for text
+doc_name : str
+    The name of the document the content is from
+elements : Array{String}
+    A list of HTML elements you want to pull the text from
+"""
+function upsert_document_from_url(corpus::Corpus, url::String, doc_name::String, elements::Array{String}=["h1", "h2", "p"])
+    doc_text = read_html_url(url, elements)
+    upsert_document(corpus, doc_text, doc_name)
 end
 
 """

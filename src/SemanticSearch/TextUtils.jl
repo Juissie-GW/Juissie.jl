@@ -4,8 +4,52 @@ module TextUtils
 
 using Transformers
 using Transformers.TextEncoders
+using HTTP
+using Gumbo
+using Cascadia
 
-export chunkify
+export chunkify, read_html_url
+
+"""
+    function get_files_path()
+
+Simple function to return the path to the files subdirectory.
+
+Example Usage
+-------------
+test_bin_path = get_files_path()*"test.bin"
+"""
+function get_files_path()
+    CURR_DIR = @__DIR__
+    return CURR_DIR * "/files/"
+end
+
+"""
+    read_html_url(url::String, elements::Array{String})
+
+Returns a string of text from the provided HTML elements on a webpage.
+
+Parameters
+----------
+url : String
+    the url you want to read
+elements : Array{String}
+    html elements to look for in the web page, e.g. ["h1", "p"].
+
+Notes
+-----
+Defaults to extracting headers and paragraphs
+"""
+function read_html_url(url::String, elements::Array{String}=["h1", "h2", "p"])
+    elements_str = join(elements, ", ")
+    response = HTTP.get(url)
+    html_content = String(response.body)
+    parsed_html = Gumbo.parsehtml(html_content)
+    selected_elements = eachmatch(Selector(elements_str), parsed_html.root)
+    str_content = join([text(element) for element in selected_elements], " ")
+    return str_content
+end
+
 
 """
 A simple script that allows a user to split a large file into multiple smaller files. 
