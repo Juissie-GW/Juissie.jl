@@ -193,11 +193,18 @@ context : OptionalContext, which is Union{Vector{String}, Nothing}
 Notes
 -----
 We use the Alpaca prompt, found here: https://github.com/tatsu-lab/stanford_alpaca
+with minor modifications that reflect our response preferences.
 """
 function build_full_query(query::String, context::OptionalContext=nothing)
+    prompt_preferences = """
+    Write concisely.
+    In your response, do not include any parenthetical citations (e.g. "[32]").
+    """
+    
     full_query = """
     Below is an instruction that describes a task. Write a response that appropriately completes the request.
-    
+    $prompt_preferences
+
     ### Instruction:
     $query
     """
@@ -206,7 +213,8 @@ function build_full_query(query::String, context::OptionalContext=nothing)
         context_str = join(["- " * s for s in context], "\n")
         full_query = """
         Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
-        
+        $prompt_preferences
+
         ### Instruction:
         $query
         
