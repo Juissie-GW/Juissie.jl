@@ -15,7 +15,8 @@ export OAIGenerator,
     generate_with_corpus,
     upsert_chunk_to_generator,
     upsert_document_to_generator,
-    upsert_document_from_url_to_generator
+    upsert_document_from_url_to_generator,
+    load_OAIGeneratorWithCorpus
 
 
 const OptionalContext = Union{Vector{String}, Nothing}
@@ -50,6 +51,7 @@ struct OAIGenerator <: Generator
     body_dict::Dict{String,Any}
 end
 
+
 """
     struct OAIGeneratorWithCorpus
 
@@ -79,7 +81,7 @@ end
 
 Initializes an OAIGenerator struct.
 
-Attributes
+Parameters
 ----------
 auth_token :: Union{String, Nothing}
     this is your OPENAI API key. You can either pass it explicitly as a string
@@ -110,15 +112,15 @@ end
 
 Initializes an OAIGeneratorWithCorpus.
 
-Attributes
+Parameters
 ----------
+corpus_name : str or nothing
+    the name that you want to give the database
+    optional. if left as nothing, we use an in-memory database
 auth_token :: Union{String, Nothing}
     this is your OPENAI API key. You can either pass it explicitly as a string
     or leave this argument as nothing. In the latter case, we will look in your
     environmental variables for "OAI_KEY"
-corpus_name : str or nothing
-    the name that you want to give the database
-    optional. if left as nothing, we use an in-memory database
 embedder_model_path : str
     a path to a HuggingFace-hosted model
     e.g. "BAAI/bge-small-en-v1.5"
@@ -127,8 +129,8 @@ max_seq_len : int
     This should be the max sequence length of the tokenizer
 """
 function OAIGeneratorWithCorpus(
-        auth_token::Union{String, Nothing}=nothing, 
         corpus_name::Union{String, Nothing}=nothing,
+        auth_token::Union{String, Nothing}=nothing,
         embedder_model_path::String="BAAI/bge-small-en-v1.5", 
         max_seq_len::Int=512
     )
@@ -136,6 +138,40 @@ function OAIGeneratorWithCorpus(
     corpus = Corpus(corpus_name, embedder_model_path, max_seq_len)
     new_generator = OAIGeneratorWithCorpus(
         base_generator.url, base_generator.header, base_generator.body_dict, corpus
+    )
+    return new_generator
+end
+
+"""
+    function load_OAIGeneratorWithCorpus(corpus_name::String, auth_token::Union{String, Nothing}=nothing)
+
+Loads an existing corpus and uses it to initialize an GeneratorWithCorpus
+
+Parameters
+----------
+corpus_name : str
+    the name that you want to give the database
+auth_token :: Union{String, Nothing}
+    this is your OPENAI API key. You can either pass it explicitly as a string
+    or leave this argument as nothing. In the latter case, we will look in your
+    environmental variables for "OAI_KEY"
+
+Notes
+-----
+corpus_name is ordered first because Julia uses positional arguments and 
+auth_token is optional.
+"""
+function load_OAIGeneratorWithCorpus(
+        corpus_name::String,
+        auth_token::Union{String, Nothing}=nothing
+    )
+    base_generator = OAIGenerator(auth_token)
+    corpus = load_corpus(corpus_name)
+    new_generator = OAIGeneratorWithCorpus(
+        base_generator.url, 
+        base_generator.header, 
+        base_generator.body_dict, 
+        corpus
     )
     return new_generator
 end
