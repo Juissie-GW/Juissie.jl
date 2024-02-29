@@ -2,6 +2,7 @@
 module PdfReader
 
 using PDFIO
+using Logging
 
 export getAllTextInPDF, getPagesInPDF_All
 
@@ -95,17 +96,20 @@ function getPagesFromPdf(pdfHandel::PDFIO.PD.PDDocImpl, firstPageInclusive::Numb
     firstPageInclusive = min(firstPageInclusive, lastPageInclusive)
     lastPageInclusive = max(firstPageInclusive, lastPageInclusive)
 
+    # The PDF reader spams out a lot of log warnings. Disable them for now
+    Logging.disable_logging(Logging.Warn)
     # Loop over every page in the range, extracting the text into the result buffer
     for currentPage::Number in range(firstPageInclusive, lastPageInclusive)
         try
-            # The pdf file reader is a little flaky, so it'll 
-            # produce AssertionErrors that the width of the page is too large :shrug:
             PDFIO.pdPageExtractText(result, pdDocGetPage(pdfHandel, currentPage))
         catch e
             println("Encountered error when trying to read page " * string(currentPage) * "\nSkipping page. Error:\n" * string(e))
             continue
         end
     end # end loop over pages
+    # Re-enable the logger
+    Logging.disable_logging(Logging.Info)
+
     # At the end cash out whatever's in the buffer
     return bufferToString!(result)
 end # function getPagesFromPdf()
