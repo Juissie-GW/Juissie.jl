@@ -5,13 +5,15 @@ include("Generation.jl")
 
 using .SemanticSearch
 export Corpus, 
+    load_corpus,
     upsert_chunk, 
-    upsert_document, 
+    upsert_document,
     upsert_document_from_url,
+    upsert_document_from_pdf, 
+    upsert_document_from_txt, 
     search,
     Embedder, 
-    embed,
-    load_corpus
+    embed
 
 using .Generation
 export OAIGenerator,
