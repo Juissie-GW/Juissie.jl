@@ -13,10 +13,20 @@ include("Embedding.jl")
 using .Embedding
 include("TextUtils.jl")
 using .TextUtils
+include("DataReader/PdfReader.jl")
+using .PdfReader
+include("DataReader/TxtReader.jl")
+using .TxtReader
 
 CURR_DIR = @__DIR__
 
-export Corpus, upsert_chunk, upsert_document, search, load_corpus
+export Corpus,
+    upsert_chunk,
+    upsert_document,
+    upsert_document_from_pdf,
+    upsert_document_from_txt,
+    search,
+    load_corpus
 
 """
     struct Corpus
@@ -52,13 +62,13 @@ The struct is mutable because we want to be able to change things like
 incrementing next_idx.
 """
 mutable struct Corpus
-    corpus_name :: Union{String, Nothing}
-    db :: SQLite.DB
-    hnsw :: Union{HNSW.HierarchicalNSW, Nothing}
-    embedder :: Embedding.Embedder
-    max_seq_len :: Int64
-    data :: Vector{Any}
-    next_idx :: Int64
+    corpus_name::Union{String,Nothing}
+    db::SQLite.DB
+    hnsw::Union{HNSW.HierarchicalNSW,Nothing}
+    embedder::Embedding.Embedder
+    max_seq_len::Int64
+    data::Vector{Any}
+    next_idx::Int64
 end
 
 """
@@ -86,7 +96,7 @@ max_seq_len : int
     The maximum number of tokens per chunk.
     This should be the max sequence length of the tokenizer
 """
-function Corpus(corpus_name::Union{String, Nothing}=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5", max_seq_len::Int=512)
+function Corpus(corpus_name::Union{String,Nothing}=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5", max_seq_len::Int=512)
     # initialize embedder
     embedder = Embedder(embedder_model_path)
 
@@ -101,25 +111,28 @@ function Corpus(corpus_name::Union{String, Nothing}=nothing, embedder_model_path
             user_input = readline()
             if user_input == "y"
                 # delete it
-                rm(db_path) 
+                rm(db_path)
             elseif user_input == "n"
                 println("Corpus creation failed; try a different corpus name.")
                 return
             else
                 println("Invalid input. Please enter 'y' for yes or 'n' for no.")
-            end 
+            end
         end
         db = SQLite.DB(db_path)
     end
 
     DBInterface.execute(db, "DROP TABLE IF EXISTS metadata")
-    DBInterface.execute(db, """
-    CREATE TABLE metadata (
-        idx INT PRIMARY KEY,
-        doc_name TEXT,
-        chunk TEXT
+    DBInterface.execute(
+        db,
+        """
+CREATE TABLE metadata (
+    idx INT PRIMARY KEY,
+    doc_name TEXT,
+    chunk TEXT
+)
+"""
     )
-    """)
 
     # don't initialize hnsw yet because it needs initial features
     hnsw = nothing
@@ -135,7 +148,7 @@ function Corpus(corpus_name::Union{String, Nothing}=nothing, embedder_model_path
         # test if the hnsw file exists
         if isfile(corpus_data_path)
             # file exists ; delete it
-            rm(corpus_data_path) 
+            rm(corpus_data_path)
         end
         open(corpus_data_path, "w") do file
             write(file, json_str)
@@ -174,7 +187,7 @@ function load_corpus(corpus_name::String)
         embedder_model_path = corpus_data["embedder_model_path"]
         embedder = Embedder(embedder_model_path)
         max_seq_len = corpus_data["max_seq_len"]
-        
+
         return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
     catch e
         if hasproperty(e, :msg)
@@ -239,7 +252,7 @@ function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
         (corpus.next_idx, doc_name, chunk)
     )
 
-    corpus.next_idx += 1;
+    corpus.next_idx += 1
 end
 
 """
@@ -261,13 +274,78 @@ doc_name : str
 """
 function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
     chunks = chunkify(
-        doc_text, 
-        corpus.embedder.tokenizer, 
+        doc_text,
+        corpus.embedder.tokenizer,
         corpus.max_seq_len
     )
     for chunk in chunks
         upsert_chunk(corpus, chunk, doc_name)
     end
+end
+
+"""
+    function upsert_document(corpus::Corpus, documents::Vector{String}, doc_name::String)
+
+Upsert a collection of documents (i.e., a vector of long strings).
+Does so by upserting each entry of the provided documents vector (which in turn will
+chunkify, each document further into appropriately sized chunks).
+
+See the upsert_document(...) above for more details
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+documents : Vector{String}
+    a collection of long strings to upsert.
+doc_name : str
+    The name of the document the content is from
+"""
+function upsert_document(corpus::Corpus, documents::Vector{String}, doc_name::String)
+    for doc::String in documents
+        upsert_document(corpus, doc, doc_name)
+    end
+end
+
+"""
+    function upsert_document_from_pdf(corpus::Corpus, filePath::String, doc_name::String)
+
+Upsert all the data in a PDF file into the provided corpus.
+See the upsert_document(...) above for more details.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+filePath : String
+    The path to the PDF file to read
+doc_name : str
+    The name of the document the content is from
+"""
+function upsert_document_from_pdf(corpus::Corpus, filePath::String, doc_name::String)
+    upsert_document(corpus,
+        PdfReader.getAllTextInPDF(filePath),
+        doc_name)
+end
+
+"""
+    function upsert_document_from_txt(corpus::Corpus, filePath::String, doc_name::String)
+
+Upsert all the data from the text file into the provided corpus.
+
+Parameters
+----------
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+filePath : String
+    The path to the txt file to read
+doc_name : str
+    The name of the document the content is from
+"""
+function upsert_document_from_txt(corpus::Corpus, filePath::String, doc_name::String)
+    upsert_document(corpus,
+        TxtReader.getAllTextInFile(filePath),
+        doc_name)
 end
 
 """
@@ -283,8 +361,8 @@ corpus : an initialized Corpus object
 """
 function index(corpus::Corpus)
     corpus.hnsw = HierarchicalNSW(
-            corpus.data; 
-            efConstruction=100, M=16, ef=50
+        corpus.data;
+        efConstruction=100, M=16, ef=50
     )
     add_to_graph!(corpus.hnsw)
 
@@ -296,7 +374,7 @@ function index(corpus::Corpus)
         # test if the hnsw file exists
         if isfile(file_path)
             # file exists ; delete it
-            rm(file_path) 
+            rm(file_path)
         end
 
         # now serialize the vector index
@@ -336,10 +414,10 @@ function search(corpus::Corpus, query::String, k::Int=5)
     # execute query against SQLite DB
     idx_list_str = join(idx_list, ",")
     query_result = DBInterface.execute(
-        corpus.db, 
+        corpus.db,
         "SELECT * FROM metadata WHERE idx IN ($idx_list_str)"
     )
-    
+
     # ensure the query result is ordered like the indices (by distance)
     df = DataFrame(query_result)
     sort_order = Dict(idx => order for (order, idx) in enumerate(idx_list))
