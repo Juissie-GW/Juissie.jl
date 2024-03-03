@@ -13,9 +13,9 @@ Pkg.add("DotEnv")
 Then, use it to access environmental variables from your `.env` file:
 ```julia
 using DotEnv
-DotEnv.config()
+cfg = DotEnv.config()
 
-api_key = ENV["OAI_KEY"]
+api_key = cfg["OAI_KEY"]
 ```
 
 Note that DotEnv looks for `.env` in the *current* directory, i.e. that of the calling function. If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YOUR_PATH_HERE)`

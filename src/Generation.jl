@@ -44,6 +44,12 @@ All natural language generation should be done via a "Generator"
 object of some kind for consistency. In the future, if we 
 decide to host a model locally or something, we might do that
 via a HFGenerator struct.
+
+When instantiating a new OAIGenerator in an externally-viewable
+setting (e.g. notebooks committed to GitHub or a public demo),
+it is important to place a semicolon after the command, e.g. 
+'''generator=load_OAIGeneratorWithCorpus("greek_philosophers");'''
+to ensure that your OAI API key is not inadvertently shared.
 """
 struct OAIGenerator <: Generator
     url::String
@@ -67,6 +73,14 @@ body_dict : Dict{String, Any}
     this is the JSON payload to be sent in the body of the request
 corpus : an initialized Corpus object
     the corpus / "vector database" you want to use
+
+Notes
+-----
+When instantiating a new OAIGenerator in an externally-viewable
+setting (e.g. notebooks committed to GitHub or a public demo),
+it is important to place a semicolon after the command, e.g. 
+'''generator=load_OAIGeneratorWithCorpus("greek_philosophers");'''
+to ensure that your OAI API key is not inadvertently shared.
 """
 struct OAIGeneratorWithCorpus <: GeneratorWithCorpus
     url::String
@@ -87,12 +101,20 @@ auth_token :: Union{String, Nothing}
     this is your OPENAI API key. You can either pass it explicitly as a string
     or leave this argument as nothing. In the latter case, we will look in your
     environmental variables for "OAI_KEY"
+
+Notes
+-----
+When instantiating a new OAIGenerator in an externally-viewable
+setting (e.g. notebooks committed to GitHub or a public demo),
+it is important to place a semicolon after the command, e.g. 
+'''generator=load_OAIGeneratorWithCorpus("greek_philosophers");'''
+to ensure that your OAI API key is not inadvertently shared.
 """
 function OAIGenerator(auth_token::Union{String, Nothing}=nothing)
     if isnothing(auth_token)
-        path_to_env = joinpath(@__DIR__, "..", ".env")
-        DotEnv.config(path_to_env)
-        auth_token = ENV["OAI_KEY"]
+        path_to_env = joinpath(dirname(@__DIR__), ".env")
+        cfg = DotEnv.config(path_to_env)
+        auth_token = cfg["OAI_KEY"]
     end
 
     url = "https://api.openai.com/v1/chat/completions"
@@ -127,6 +149,14 @@ embedder_model_path : str
 max_seq_len : int
     The maximum number of tokens per chunk.
     This should be the max sequence length of the tokenizer
+
+Notes
+-----
+When instantiating a new OAIGenerator in an externally-viewable
+setting (e.g. notebooks committed to GitHub or a public demo),
+it is important to place a semicolon after the command, e.g. 
+'''generator=load_OAIGeneratorWithCorpus("greek_philosophers");'''
+to ensure that your OAI API key is not inadvertently shared.
 """
 function OAIGeneratorWithCorpus(
         corpus_name::Union{String, Nothing}=nothing,
@@ -160,6 +190,12 @@ Notes
 -----
 corpus_name is ordered first because Julia uses positional arguments and 
 auth_token is optional.
+
+When instantiating a new OAIGenerator in an externally-viewable
+setting (e.g. notebooks committed to GitHub or a public demo),
+it is important to place a semicolon after the command, e.g. 
+'''generator=load_OAIGeneratorWithCorpus("greek_philosophers");'''
+to ensure that your OAI API key is not inadvertently shared.
 """
 function load_OAIGeneratorWithCorpus(
         corpus_name::String,
