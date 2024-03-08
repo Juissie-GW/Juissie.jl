@@ -11,7 +11,7 @@ using .SemanticSearch
 
 export OAIGenerator,
     OAIGeneratorWithCorpus,
-    generate, 
+    generate,
     generate_with_corpus,
     upsert_chunk_to_generator,
     upsert_document_to_generator,
@@ -19,7 +19,7 @@ export OAIGenerator,
     load_OAIGeneratorWithCorpus
 
 
-const OptionalContext = Union{Vector{String}, Nothing}
+const OptionalContext = Union{Vector{String},Nothing}
 abstract type Generator end
 abstract type GeneratorWithCorpus <: Generator end
 
@@ -35,7 +35,7 @@ url : String
     the URL of the OpenAI API endpoint
 header : Vector{Pair{String, String}}
     key-value pairs representing the HTTP headers for the request
-body_dict : Dict{String, Any}
+body : Dict{String, Any}
     this is the JSON payload to be sent in the body of the request
 
 Notes
@@ -53,8 +53,8 @@ to ensure that your OAI API key is not inadvertently shared.
 """
 struct OAIGenerator <: Generator
     url::String
-    header::Vector{Pair{String, String}}
-    body_dict::Dict{String,Any}
+    header::Vector{Pair{String,String}}
+    body::Dict{String,Any}
 end
 
 
@@ -69,7 +69,7 @@ url : String
     the URL of the OpenAI API endpoint
 header : Vector{Pair{String, String}}
     key-value pairs representing the HTTP headers for the request
-body_dict : Dict{String, Any}
+body : Dict{String, Any}
     this is the JSON payload to be sent in the body of the request
 corpus : an initialized Corpus object
     the corpus / "vector database" you want to use
@@ -84,8 +84,8 @@ to ensure that your OAI API key is not inadvertently shared.
 """
 struct OAIGeneratorWithCorpus <: GeneratorWithCorpus
     url::String
-    header::Vector{Pair{String, String}}
-    body_dict::Dict{String,Any}
+    header::Vector{Pair{String,String}}
+    body::Dict{String,Any}
     corpus::Corpus
 end
 
@@ -110,7 +110,7 @@ it is important to place a semicolon after the command, e.g.
 '''generator=load_OAIGeneratorWithCorpus("greek_philosophers");'''
 to ensure that your OAI API key is not inadvertently shared.
 """
-function OAIGenerator(auth_token::Union{String, Nothing}=nothing)
+function OAIGenerator(auth_token::Union{String,Nothing} = nothing)
     if isnothing(auth_token)
         path_to_env = joinpath(dirname(@__DIR__), ".env")
         cfg = DotEnv.config(path_to_env)
@@ -118,15 +118,10 @@ function OAIGenerator(auth_token::Union{String, Nothing}=nothing)
     end
 
     url = "https://api.openai.com/v1/chat/completions"
-    header = [
-        "Content-Type" => "application/json",
-        "Authorization" => "Bearer $auth_token"
-    ]
-    body_dict = Dict(
-        "model" => "gpt-3.5-turbo"
-    )
+    header = ["Content-Type" => "application/json", "Authorization" => "Bearer $auth_token"]
+    body = Dict("model" => "gpt-3.5-turbo")
 
-    return OAIGenerator(url, header, body_dict)
+    return OAIGenerator(url, header, body)
 end
 
 """
@@ -159,15 +154,18 @@ it is important to place a semicolon after the command, e.g.
 to ensure that your OAI API key is not inadvertently shared.
 """
 function OAIGeneratorWithCorpus(
-        corpus_name::Union{String, Nothing}=nothing,
-        auth_token::Union{String, Nothing}=nothing,
-        embedder_model_path::String="BAAI/bge-small-en-v1.5", 
-        max_seq_len::Int=512
-    )
+    corpus_name::Union{String,Nothing} = nothing,
+    auth_token::Union{String,Nothing} = nothing,
+    embedder_model_path::String = "BAAI/bge-small-en-v1.5",
+    max_seq_len::Int = 512,
+)
     base_generator = OAIGenerator(auth_token)
     corpus = Corpus(corpus_name, embedder_model_path, max_seq_len)
     new_generator = OAIGeneratorWithCorpus(
-        base_generator.url, base_generator.header, base_generator.body_dict, corpus
+        base_generator.url,
+        base_generator.header,
+        base_generator.body,
+        corpus,
     )
     return new_generator
 end
@@ -198,16 +196,16 @@ it is important to place a semicolon after the command, e.g.
 to ensure that your OAI API key is not inadvertently shared.
 """
 function load_OAIGeneratorWithCorpus(
-        corpus_name::String,
-        auth_token::Union{String, Nothing}=nothing
-    )
+    corpus_name::String,
+    auth_token::Union{String,Nothing} = nothing,
+)
     base_generator = OAIGenerator(auth_token)
     corpus = load_corpus(corpus_name)
     new_generator = OAIGeneratorWithCorpus(
-        base_generator.url, 
-        base_generator.header, 
-        base_generator.body_dict, 
-        corpus
+        base_generator.url,
+        base_generator.header,
+        base_generator.body,
+        corpus,
     )
     return new_generator
 end
@@ -231,12 +229,12 @@ Notes
 We use the Alpaca prompt, found here: https://github.com/tatsu-lab/stanford_alpaca
 with minor modifications that reflect our response preferences.
 """
-function build_full_query(query::String, context::OptionalContext=nothing)
+function build_full_query(query::String, context::OptionalContext = nothing)
     prompt_preferences = """
     Write concisely.
     In your response, do not include any parenthetical citations (e.g. "[32]").
     """
-    
+
     full_query = """
     Below is an instruction that describes a task. Write a response that appropriately completes the request.
     $prompt_preferences
@@ -253,10 +251,10 @@ function build_full_query(query::String, context::OptionalContext=nothing)
 
         ### Instruction:
         $query
-        
+
         ### Input:
         $context_str
-        
+
         ### Response:
         """
     end
@@ -276,7 +274,7 @@ generator : Union{OAIGenerator, Nothing}
     leaving this as a union with nothing to note that we may want to support other 
     generator types in the future (e.g. HFGenerator, etc.)
 query : String
-    the main instruction or query string. This is basically your question
+    the main query string. This is basically your question
 context : OptionalContext, which is Union{Vector{String}, Nothing}
     optional list of contextual chunk strings to provide the generator additional 
     context for the query. Ultimately, these will be coming from our vector DB
@@ -284,31 +282,27 @@ temperature : Float64
     controls the stochasticity of the output generated by the model
 """
 function generate(
-        generator::Union{Generator, GeneratorWithCorpus}, 
-        query::String, 
-        context::OptionalContext=nothing, 
-        temperature::Float64=0.7
-    )
-    # build full query from query and context
+    generator::Union{Generator,GeneratorWithCorpus},
+    query::String,
+    context::OptionalContext = nothing,
+    temperature::Float64 = 0.7,
+)
     full_query = build_full_query(query, context)
-    
-    if isa(generator, Union{OAIGenerator, OAIGeneratorWithCorpus})
-        generator.body_dict["temperature"] = temperature
-        generator.body_dict["messages"] = [
-            Dict(
-                "role" => "user", 
-                "content" => full_query
-            )
-        ]
-        body = JSON.json(generator.body_dict)
+
+    if isa(generator, Union{OAIGenerator,OAIGeneratorWithCorpus})
+        generator.body["temperature"] = temperature
+        generator.body["messages"] = [Dict("role" => "user", "content" => full_query)]
+        body = JSON.json(generator.body)
         response = HTTP.request("POST", generator.url, generator.header, body)
-    
+
         if response.status == 200
             response_str = String(response.body)
             parsed_dict = JSON.parse(response_str)
             result = parsed_dict["choices"][1]["message"]["content"]
         else
-            error("Request failed with status code $(response.status): $(String(response.body))")
+            throw(error(
+                "Request failed. Status code $(response.status): $(String(response.body))",
+            ))
         end
     else
         # if we have time, we can use this to generate via something locally-hosted
@@ -337,12 +331,11 @@ temperature : Float64
     controls the stochasticity of the output generated by the model
 """
 function generate_with_corpus(
-        generator::GeneratorWithCorpus, 
-        query::String, 
-        k::Int=5, 
-        temperature::Float64=0.7
-    )
-    # search corpus
+    generator::GeneratorWithCorpus,
+    query::String,
+    k::Int = 5,
+    temperature::Float64 = 0.7,
+)
     idx_list, doc_names, chunks, distances = search(generator.corpus, query, k)
     result = generate(generator, query, chunks, temperature)
     return result, idx_list, doc_names, chunks
@@ -374,10 +367,10 @@ upsert_chunk. This means any uses of it in Juissie must be
 qualified, and without doing so, neither actually gets defined.
 """
 function upsert_chunk_to_generator(
-        generator::GeneratorWithCorpus, 
-        chunk::String, 
-        doc_name::String
-    )
+    generator::GeneratorWithCorpus,
+    chunk::String,
+    doc_name::String,
+)
     upsert_chunk(generator.corpus, chunk, doc_name)
 end
 
@@ -402,10 +395,10 @@ Notes
 See note for upsert_chunk_to_generator - same idea.
 """
 function upsert_document_to_generator(
-        generator::GeneratorWithCorpus, 
-        doc_text::String, 
-        doc_name::String
-    )
+    generator::GeneratorWithCorpus,
+    doc_text::String,
+    doc_name::String,
+)
     upsert_document(generator.corpus, doc_text, doc_name)
 end
 
@@ -431,11 +424,11 @@ Notes
 See note for upsert_chunk_to_generator - same idea.
 """
 function upsert_document_from_url_to_generator(
-        generator::GeneratorWithCorpus, 
-        url::String, 
-        doc_name::String, 
-        elements::Array{String}=["h1", "h2", "p"]
-    )
+    generator::GeneratorWithCorpus,
+    url::String,
+    doc_name::String,
+    elements::Array{String} = ["h1", "h2", "p"],
+)
     upsert_document_from_url(generator.corpus, url, doc_name, elements)
 end
 

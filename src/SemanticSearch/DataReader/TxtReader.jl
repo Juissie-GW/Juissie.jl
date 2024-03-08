@@ -75,7 +75,9 @@ function getAllTextInFile(filename::String)::String
         close(file)
         return result
     catch
-        println("ERROR: Encountered error when reading file (does it exist?). Filename: '$filename'\nerror: $e")
+        println(
+            "ERROR: Encountered error when reading file (does it exist?). Filename: '$filename'\nerror: $e",
+        )
     end # try
     return "" # return empty string if file could NOT be read
 end # function getAllTextInFile(filename:string)
@@ -105,7 +107,9 @@ function appendToFile(filename::String, contents::String)::Bool
         end # open(filename, "w") file do
         return true
     catch e
-        println("ERROR: File could not be opened for writting. Filename: '$filename'\nerror: $e")
+        println(
+            "ERROR: File could not be opened for writting. Filename: '$filename'\nerror: $e",
+        )
     end # try
     return false
 end # function appendToFile(filename::String, contents::String)::Bool

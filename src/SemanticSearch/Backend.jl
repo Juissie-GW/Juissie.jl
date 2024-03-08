@@ -20,7 +20,7 @@ using .TxtReader
 
 CURR_DIR = @__DIR__
 
-export Corpus, 
+export Corpus,
     upsert_chunk,
     upsert_document,
     upsert_document_from_url,
@@ -97,11 +97,13 @@ max_seq_len : int
     The maximum number of tokens per chunk.
     This should be the max sequence length of the tokenizer
 """
-function Corpus(corpus_name::Union{String,Nothing}=nothing, embedder_model_path::String="BAAI/bge-small-en-v1.5", max_seq_len::Int=512)
-    # initialize embedder
+function Corpus(
+    corpus_name::Union{String,Nothing} = nothing,
+    embedder_model_path::String = "BAAI/bge-small-en-v1.5",
+    max_seq_len::Int = 512,
+)
     embedder = Embedder(embedder_model_path)
 
-    # initialize database
     if isnothing(corpus_name)
         db = SQLite.DB() # in-memory db
     else
@@ -132,7 +134,7 @@ CREATE TABLE metadata (
     doc_name TEXT,
     chunk TEXT
 )
-"""
+""",
     )
 
     # don't initialize hnsw yet because it needs initial features
@@ -140,10 +142,8 @@ CREATE TABLE metadata (
 
     # if not in-memory only, save info about the corpus as a json
     if !isnothing(corpus_name)
-        corpus_data = Dict(
-            "embedder_model_path" => embedder_model_path,
-            "max_seq_len" => max_seq_len
-        )
+        corpus_data =
+            Dict("embedder_model_path" => embedder_model_path, "max_seq_len" => max_seq_len)
         json_str = JSON.json(corpus_data)
         corpus_data_path = "$(CURR_DIR)/files/$(corpus_name)_data.json"
         # test if the hnsw file exists
@@ -172,11 +172,8 @@ corpus_name : str
 """
 function load_corpus(corpus_name::String)
     try
-        # sqlite database
         db_path = "$(CURR_DIR)/files/$(corpus_name).db"
         db = SQLite.DB(db_path)
-
-        # vector index
         hnsw_path = "$(CURR_DIR)/files/$(corpus_name).bin"
         hnsw = open(deserialize, hnsw_path)
 
@@ -246,11 +243,13 @@ function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
     push!(corpus.data, embedding)
 
     # insert metadata into SQLite
-    DBInterface.execute(corpus.db, """
-        INSERT INTO metadata (idx, doc_name, chunk) 
-        VALUES (?, ?, ?)
-        """,
-        (corpus.next_idx, doc_name, chunk)
+    DBInterface.execute(
+        corpus.db,
+        """
+INSERT INTO metadata (idx, doc_name, chunk) 
+VALUES (?, ?, ?)
+""",
+        (corpus.next_idx, doc_name, chunk),
     )
 
     corpus.next_idx += 1
@@ -274,11 +273,7 @@ doc_name : str
     The name of the document the content is from
 """
 function upsert_document(corpus::Corpus, doc_text::String, doc_name::String)
-    chunks = chunkify(
-        doc_text,
-        corpus.embedder.tokenizer,
-        corpus.max_seq_len
-    )
+    chunks = chunkify(doc_text, corpus.embedder.tokenizer, corpus.max_seq_len)
     for chunk in chunks
         upsert_chunk(corpus, chunk, doc_name)
     end
@@ -324,7 +319,12 @@ doc_name : str
 elements : Array{String}
     A list of HTML elements you want to pull the text from
 """
-function upsert_document_from_url(corpus::Corpus, url::String, doc_name::String, elements::Array{String}=["h1", "h2", "p"])
+function upsert_document_from_url(
+    corpus::Corpus,
+    url::String,
+    doc_name::String,
+    elements::Array{String} = ["h1", "h2", "p"],
+)
     doc_text = read_html_url(url, elements)
     upsert_document(corpus, doc_text, doc_name)
 end
@@ -345,9 +345,7 @@ doc_name : str
     The name of the document the content is from
 """
 function upsert_document_from_pdf(corpus::Corpus, filePath::String, doc_name::String)
-    upsert_document(corpus,
-        PdfReader.getAllTextInPDF(filePath),
-        doc_name)
+    upsert_document(corpus, PdfReader.getAllTextInPDF(filePath), doc_name)
 end
 
 """
@@ -365,9 +363,7 @@ doc_name : str
     The name of the document the content is from
 """
 function upsert_document_from_txt(corpus::Corpus, filePath::String, doc_name::String)
-    upsert_document(corpus,
-        TxtReader.getAllTextInFile(filePath),
-        doc_name)
+    upsert_document(corpus, TxtReader.getAllTextInFile(filePath), doc_name)
 end
 
 """
@@ -382,10 +378,7 @@ corpus : an initialized Corpus object
     the corpus / "vector database" you want to use
 """
 function index(corpus::Corpus)
-    corpus.hnsw = HierarchicalNSW(
-        corpus.data;
-        efConstruction=100, M=16, ef=50
-    )
+    corpus.hnsw = HierarchicalNSW(corpus.data; efConstruction = 100, M = 16, ef = 50)
     add_to_graph!(corpus.hnsw)
 
     if !isnothing(corpus.corpus_name)
@@ -422,7 +415,7 @@ query : str
 k : int
     The number of nearest-neighbor vectors to fetch
 """
-function search(corpus::Corpus, query::String, k::Int=5)
+function search(corpus::Corpus, query::String, k::Int = 5)
     if isnothing(corpus.hnsw)
         index(corpus)
     end
@@ -430,14 +423,15 @@ function search(corpus::Corpus, query::String, k::Int=5)
     embedding = embed(corpus.embedder, query)
     idxs, distances = knn_search(corpus.hnsw, [embedding], k)
 
-    # idxs come back as a vector of hexadecimals, so convert to readable ints
+    # for some reason idxs come back as a vector of hexadecimals, 
+    # so convert to readable ints
     idx_list = [Int(x) for x in idxs[1]]
 
     # execute query against SQLite DB
     idx_list_str = join(idx_list, ",")
     query_result = DBInterface.execute(
         corpus.db,
-        "SELECT * FROM metadata WHERE idx IN ($idx_list_str)"
+        "SELECT * FROM metadata WHERE idx IN ($idx_list_str)",
     )
 
     # ensure the query result is ordered like the indices (by distance)

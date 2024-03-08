@@ -4,21 +4,21 @@ include("SemanticSearch/SemanticSearch.jl")
 include("Generation.jl")
 
 using .SemanticSearch
-export Corpus, 
+export Corpus,
     load_corpus,
-    upsert_chunk, 
+    upsert_chunk,
     upsert_document,
     upsert_document_from_url,
-    upsert_document_from_pdf, 
-    upsert_document_from_txt, 
+    upsert_document_from_pdf,
+    upsert_document_from_txt,
     search,
-    Embedder, 
+    Embedder,
     embed
 
 using .Generation
 export OAIGenerator,
     OAIGeneratorWithCorpus,
-    generate, 
+    generate,
     generate_with_corpus,
     upsert_chunk_to_generator,
     upsert_document_to_generator,

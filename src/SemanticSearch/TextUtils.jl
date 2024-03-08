@@ -40,14 +40,14 @@ Notes
 -----
 Defaults to extracting headers and paragraphs
 """
-function read_html_url(url::String, elements::Array{String}=["h1", "h2", "p"])
+function read_html_url(url::String, elements::Array{String} = ["h1", "h2", "p"])
     elements_str = join(elements, ", ")
     response = HTTP.get(url)
     html_content = String(response.body)
     parsed_html = Gumbo.parsehtml(html_content)
-    selected_elements = eachmatch(Selector(elements_str), parsed_html.root)
-    str_content = join([text(element) for element in selected_elements], " ")
-    return str_content
+    matched_elements = eachmatch(Selector(elements_str), parsed_html.root)
+    content = join([text(element) for element in matched_elements], " ")
+    return content
 end
 
 
@@ -60,6 +60,17 @@ Parameters
 ----------
 text : String
     The text you want to split into sentences.
+
+Notes
+-----
+Regex is hard to read. The first part looks for spaces following 
+end-of-sentence punctuation. The second part matches at the end of the string.
+
+Regex in Julia uses an r identifier prefix.
+
+References
+----------
+https://www.geeksforgeeks.org/regular-expressions-in-julia/
 """
 function sentence_splitter(text::String)
     regex = r"(?<=[.!?])\s+|\Z"
@@ -99,12 +110,10 @@ Example Usage
     "Peter Piper picked a peck of pickled peppers."
     "A peck of pickled peppers Peter Piper picked."
 """
-function chunkify(text::String, tokenizer, sequence_length::Int=512)
+function chunkify(text::String, tokenizer, sequence_length::Int = 512)
     sentences = sentence_splitter(text)
-    sentence_token_lengths = [
-        length(encode(tokenizer, sentence).segment)
-        for sentence in sentences
-    ]
+    sentence_token_lengths =
+        [length(encode(tokenizer, sentence).segment) for sentence in sentences]
 
     chunks = []
     current_chunk = []
