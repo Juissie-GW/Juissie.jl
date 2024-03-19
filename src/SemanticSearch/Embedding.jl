@@ -9,7 +9,10 @@ using Transformers.HuggingFace
 export Embedder, embed
 
 
-"""A struct for holding a model and a tokenizer
+"""
+    struct Embedder
+
+A struct for holding a model and a tokenizer
 
 Attributes
 ----------
@@ -29,7 +32,10 @@ struct Embedder
 end # struct Embedder
 
 
-"""Function to initialize an Embedder struct from a HuggingFace
+"""
+    function Embedder(model_name::String)
+
+Function to initialize an Embedder struct from a HuggingFace
 model path.
 
 Parameters
@@ -37,10 +43,6 @@ Parameters
 model_name : String
     a path to a HuggingFace-hosted model
     e.g. "BAAI/bge-small-en-v1.5"
-
-Notes
------
-This is sort of like a constructor in Python.
 """
 function Embedder(model_name::String)
     tokenizer, model = load_hgf_pretrained(model_name)
@@ -48,7 +50,10 @@ function Embedder(model_name::String)
 end # function Embedder
 
 
-"""Embeds a textual sequence using a provided model
+"""
+    function embed(embedder::Embedder, text::String)::AbstractVector
+
+Embeds a textual sequence using a provided model
 
 Parameters
 ----------
@@ -77,7 +82,10 @@ function embed(embedder::Embedder, text::String)::AbstractVector
 end # function embed
 
 
-"""Embeds a textual sequence using a provided Bert model
+"""
+    function embed_from_bert(embedder::Embedder, text::String)
+
+Embeds a textual sequence using a provided Bert model
 
 Parameters
 ----------

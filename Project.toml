@@ -4,8 +4,10 @@ authors = ["Lucas H. McCabe <lucasmccabe@gwu.edu>", "Arthur Bacon <arthurbacon@n
 version = "0.0.1"
 
 [deps]
+Cascadia = "54eefc05-d75b-58de-a785-1a3403f0919f"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DotEnv = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
+Gumbo = "708ec375-b3d6-5a57-a7ce-8257bf98657a"
 HNSW = "540f64fa-c57e-11e8-081c-41422cda4629"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"

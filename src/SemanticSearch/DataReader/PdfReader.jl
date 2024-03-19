@@ -28,14 +28,14 @@ fileLocation : The full path to the PDF file to open. This should be relative fr
 pagesPerEntry : How many pages should be collected into the buffere before turning it into
 an entry in the result vector.
 """
-function getAllTextInPDF(fileLocation::String, pagesPerEntry::Number=100)::Vector{String}
+function getAllTextInPDF(fileLocation::String, pagesPerEntry::Number = 100)::Vector{String}
     result::Vector{String} = Vector{String}()
 
     # Open the pdf file
     pdfHandel::PDFIO.PD.PDDocImpl = PDFIO.pdDocOpen(fileLocation)
     pageCount::Number = PDFIO.pdDocGetPageCount(pdfHandel)
     # Grab chunks of the target PDF and push them onto the result
-    for chunkStartPage::Number in range(start=1, stop=pageCount, step=pagesPerEntry)
+    for chunkStartPage::Number in range(start = 1, stop = pageCount, step = pagesPerEntry)
         chunkEndPage = chunkStartPage + pagesPerEntry
         chunkStartPage = chunkStartPage + 1 # Avoids double counting of the page
         push!(result, getPagesFromPdf(pdfHandel, chunkStartPage, chunkEndPage))
@@ -62,7 +62,11 @@ fileLocation : The location of the PDF to read
 firstPageInclusive : The first page in the range to read
 lastPageInclusive : The last page in the range to read
 """
-function getPagesFromPdf(fileLocation::String, firstPageInclusive::Number, lastPageInclusive::Number)::String
+function getPagesFromPdf(
+    fileLocation::String,
+    firstPageInclusive::Number,
+    lastPageInclusive::Number,
+)::String
     # Open the pdf file
     pdfHandel::PDFIO.PD.PDDocImpl = PDFIO.pdDocOpen(fileLocation)
     return getPagesFromPdf(pdfHandel, firstPageInclusive, lastPageInclusive)
@@ -86,7 +90,11 @@ pdfHandel : The PDF file to extract data from
 firstPageInclusive : The first page in the range to read
 lastPageInclusive : The last page in the range to read
 """
-function getPagesFromPdf(pdfHandel::PDFIO.PD.PDDocImpl, firstPageInclusive::Number, lastPageInclusive::Number)::String
+function getPagesFromPdf(
+    pdfHandel::PDFIO.PD.PDDocImpl,
+    firstPageInclusive::Number,
+    lastPageInclusive::Number,
+)::String
     result::IOBuffer = IOBuffer()
 
     # Error checking on the bounds
@@ -103,7 +111,12 @@ function getPagesFromPdf(pdfHandel::PDFIO.PD.PDDocImpl, firstPageInclusive::Numb
         try
             PDFIO.pdPageExtractText(result, pdDocGetPage(pdfHandel, currentPage))
         catch e
-            println("Encountered error when trying to read page " * string(currentPage) * "\nSkipping page. Error:\n" * string(e))
+            println(
+                "Encountered error when trying to read page " *
+                string(currentPage) *
+                "\nSkipping page. Error:\n" *
+                string(e),
+            )
             continue
         end
     end # end loop over pages

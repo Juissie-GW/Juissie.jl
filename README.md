@@ -11,8 +11,12 @@ Walkthroughs of module basic usage will be added to the `notebooks` directory as
 ## External Dependencies
 
 We make use of several pre-existing open source Julia packages. These found in `Project.toml`, but we enumerate them here, as well, for convenience:
+- Cascadia
 - DataFrames
+- DotEnv
+- Gumbo
 - HNSW
+- HTTP
 - JSON
 - LinearAlgebra
 - SQLite
