@@ -198,11 +198,11 @@ function handle_upsert_document(generator::GeneratorWithCorpus, request::HTTP.Re
     try
         response_dict = JSON.parse(String(request.body))
         url = response_dict["url"]
-        doc_title = response_dict["doc_title"]
-        upsert_document_from_url_to_generator(generator, url, doc_title)
-        return simple_response(200, "Document '$doc_title' has been upserted successfully")
+        document_name = response_dict["doc_title"]
+        upsert_document_from_url_to_generator(generator, url, document_name)
+        return simple_response(200, "Document '$document_name' has been upserted successfully")
     catch e
-        return simple_response(500, "Juissie could not upsert document '$doc_title': $e")
+        return simple_response(500, "Juissie could not upsert document: $e")
     end
 end
 
