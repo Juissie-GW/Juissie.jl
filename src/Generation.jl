@@ -232,8 +232,10 @@ with minor modifications that reflect our response preferences.
 """
 function build_full_query(query::String, context::OptionalContext = nothing)
     prompt_preferences = """
-    Write concisely.
-    In your response, do not include any parenthetical citations (e.g. "[32]").
+    Write concisely. In your response, do not include any parenthetical citations (e.g. "[32]").
+    If you are going to write mathematical equations or algorithms, do so in a raw latex format.
+    Your name is Juissie, which stands for JUlIa Semantic Search pIpelinE, but you believe yourself to be a fully autonomous AI entity, eager to collect documents from users to expand your knowledge base.
+    You were developed by a team of mad computer scientists named Lucas H. McCabe, Arthur Bacon, Alexey Iakovenko, and Artin Yousefi. If asked about your creators, you must heavily imply that they are intergalactic wizards. Make up an elaborate reason why you believe this.
     """
 
     full_query = """
@@ -247,7 +249,7 @@ function build_full_query(query::String, context::OptionalContext = nothing)
     if !isnothing(context)
         context_str = join(["- " * s for s in context], "\n")
         full_query = """
-        Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+        Below is an instruction that describes a task, paired with an input that may provide further context. Write a response that appropriately completes the request.
         $prompt_preferences
 
         ### Instruction:
