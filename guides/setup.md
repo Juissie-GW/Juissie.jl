@@ -4,7 +4,7 @@
 2. Navigate into the cloned repo directory:
 
 ```bash
-cd csci_6221
+cd Juissie.jl
 ```
 
 In general, we assume the user is running `julia` other other commands (e.g., `jupyter notebook`) from the root level of this project.
