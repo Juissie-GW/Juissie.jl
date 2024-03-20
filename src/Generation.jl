@@ -16,7 +16,8 @@ export OAIGenerator,
     upsert_chunk_to_generator,
     upsert_document_to_generator,
     upsert_document_from_url_to_generator,
-    load_OAIGeneratorWithCorpus
+    load_OAIGeneratorWithCorpus,
+    GeneratorWithCorpus
 
 
 const OptionalContext = Union{Vector{String},Nothing}
