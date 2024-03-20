@@ -1,6 +1,6 @@
 # JUISSIE (JUlIa Semantic Search pIpelinE)
 
-Herein we provide, to our knowledge, the first open source pure-Julia semantic query engine.
+Juissie is a Julia-native semantic query engine. It can be used as a package in software development workflows, or via its desktop user interface.
 
 ## Getting Started
 
@@ -8,21 +8,6 @@ Setup guides can be found in the `guides` directory. For quickstart, see `guides
 
 Walkthroughs of module basic usage will be added to the `notebooks` directory as needed, as well.
 
-## External Dependencies
-
-We make use of several pre-existing open source Julia packages. These found in `Project.toml`, but we enumerate them here, as well, for convenience:
-- Cascadia
-- DataFrames
-- DotEnv
-- Gumbo
-- HNSW
-- HTTP
-- JSON
-- LinearAlgebra
-- SQLite
-- Serialization
-- Transformers
-- UUIDs
 
 ## Questions? Reach out to our team:
 - Lucas H. McCabe ([@lucasmccabe](https://github.com/lucasmccabe), [email](mailto:lucasmccabe@gwu.edu))
