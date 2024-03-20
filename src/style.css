@@ -1,0 +1,157 @@
+/* partially inspired by the Dracula specification: https://spec.draculatheme.com/#sec-Color-Palette */
+/* and the Dracula website itself, which actually uses a slightly different palette: https://draculatheme.com/contribute#color-palette */
+/* with some aesthetic modifications via trial-and-error */
+
+:root {
+    --background-color: #0D0D11; /* darkest background and dark fonts */
+    --background-color-2: #1D1B22; /* slightly lighter background, for the container */
+    --text-color: #FFFFFF; /* this is just white */
+    --border-color: #868494; /* this is for outlines and subdued/temp fonts */
+    --button-color: #FF79C6; /* spacey-looking pink buttons */
+    --tiny-px: 1px;  /* border size */
+    --small-px: 10px; /* padding for small elements like text boxes and buttons */
+    --medium-px: 20px; /* padding for large elements like containers */
+    --large-px: 100px;
+    --mega-px: 200px;
+    --default-font: Optima, sans-serif;
+    --default-font-size: 1em;
+    --search-col-proportion: 2;
+    --flex-direction: column;
+    --full-height: 100vh; /* full height of the screen */
+}
+
+/* this is basically the void that everything sits on/in */
+body {
+    font-family: var(--default-font); /* ensures that standard headings not in an element will be the right font */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: var(--full-height);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* this is the foreground box with our content */
+.container {
+    display: flex;
+    width: 80%;
+    background: var(--background-color-2);
+    padding: var(--medium-px);  /* space between an element's content and its border */
+}
+
+/* LEFT PANEL */
+
+.search-area {
+    display: flex;
+    flex-direction: var(--flex-direction);
+    flex-grow: var(--search-col-proportion);
+    margin-right: var(--medium-px);
+}
+
+#search-bar {
+    font-family: var(--default-font);
+    font-size: var(--default-font-size);
+    padding: var(--small-px);
+    margin-bottom: var(--small-px);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: var(--tiny-px) solid var(--border-color);
+}
+
+#search-button {
+    font-family: var(--default-font);
+    font-size: var(--default-font-size);
+    padding: var(--small-px);
+    background-color: var(--button-color);
+    color: var(--background-color);
+    border: var(--border-color);
+    cursor: pointer;
+}
+
+#response-field {
+    font-family: var(--default-font);
+    font-size: var(--default-font-size);
+    padding: var(--small-px);
+    margin-bottom: var(--small-px);
+    min-height: var(--mega-px);
+    border: var(--tiny-px) solid var(--border-color);
+    background-color: var(--background-color);
+}
+
+#citations-field {
+    font-family: var(--default-font);
+    font-size: var(--default-font-size);
+    padding: var(--small-px);
+    margin-bottom: var(--small-px);
+    min-height: var(--large-px);
+    border: var(--tiny-px) solid var(--border-color);
+    background-color: var(--background-color);
+}
+
+/* RIGHT PANEL */
+
+.corpus-manager {
+    display: flex;
+    flex-direction: var(--flex-direction);
+    text-align: center;
+    width: var(--mega-px);
+    background-color: var(--background-color);
+    padding: var(--medium-px);
+    border: var(--tiny-px) solid var(--border-color);
+}
+
+.corpus-manager h3 {
+    color: var(--text-color);
+}
+
+#corpus-name {
+    font-family: var(--default-font);
+    font-size: var(--default-font-size);
+    padding: var(--small-px);
+    margin: var(--small-px);
+    background-color: var(--background-color-2);
+    color: var(--text-color);
+    border: var(--tiny-px) solid var(--border-color);
+    width: 91%;  /* via guess and check tbh, nothing principled */
+}
+
+.tabs {
+    display: flex;
+    background: var(--background-color);
+    padding: 8px; /* via guess and check tbh, nothing principled */
+}
+
+.tab-button {
+    font-family: var(--default-font);
+    padding: var(--small-px);
+    border: var(--tiny-px) solid var(--border-color);
+    background: var(--background-color-2);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.tab-button.active {
+    background-color: var(--border-color); /* switch to a lighter color when we click a tab */
+}
+
+#new-corpus-name, #url-field, #document-name-field, #api-key-field {
+    font-family: var(--default-font);
+    font-size: var(--default-font-size);
+    padding: var(--small-px);
+    margin: var(--small-px);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: var(--tiny-px) solid var(--border-color);
+    width: 81%;  /* via guess and check tbh, nothing principled */
+}
+
+#load-button, #create-button, #upsert-button, #update-key-button {
+    font-family: var(--default-font);
+    margin: var(--small-px);
+    padding: var(--small-px);
+    background-color: var(--button-color); /* note: counterintuitively this is the button color */
+    color: var(--background-color); /* note: counterintuitively this is the font color */
+    border: var(--border-color);
+    width: 91%;  /* via guess and check tbh, nothing principled */
+    cursor: pointer;
+}
