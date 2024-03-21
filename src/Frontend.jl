@@ -66,7 +66,7 @@ end
 
 
 """
-    function middleware(request::HTTP.Request)
+    function cors_middleware(request::HTTP.Request)
 
 This is a handler that every request passes through. It handles 
 preflight requests and sets the CORS header so we don't have frustrating 

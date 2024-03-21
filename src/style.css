@@ -20,7 +20,7 @@
     --full-height: 100vh; /* full height of the screen */
 }
 
-/* this is basically the void that everything sits on/in */
+/* this is the void that everything sits on/in */
 body {
     font-family: var(--default-font); /* ensures that standard headings not in an element will be the right font */
     display: flex;
@@ -90,6 +90,7 @@ body {
 
 /* RIGHT PANEL */
 
+/* the void our right panel sit in */
 .corpus-manager {
     display: flex;
     flex-direction: var(--flex-direction);
@@ -100,10 +101,12 @@ body {
     border: var(--tiny-px) solid var(--border-color);
 }
 
+/* the text that says Corpus Manager on top */
 .corpus-manager h3 {
     color: var(--text-color);
 }
 
+/* existing corpus dropdown */
 #corpus-name {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
@@ -115,6 +118,7 @@ body {
     width: 91%;  /* via guess and check tbh, nothing principled */
 }
 
+/* the New/Existing/API trio of tab buttons */
 .tabs {
     display: flex;
     background: var(--background-color);
@@ -134,6 +138,7 @@ body {
     background-color: var(--border-color); /* switch to a lighter color when we click a tab */
 }
 
+/* any right-panel free text field */
 #new-corpus-name, #url-field, #document-name-field, #api-key-field {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
@@ -145,12 +150,13 @@ body {
     width: 81%;  /* via guess and check tbh, nothing principled */
 }
 
+/* any right-panel non-tab button */
 #load-button, #create-button, #upsert-button, #update-key-button {
     font-family: var(--default-font);
     margin: var(--small-px);
     padding: var(--small-px);
-    background-color: var(--button-color); /* note: counterintuitively this is the button color */
-    color: var(--background-color); /* note: counterintuitively this is the font color */
+    background-color: var(--button-color); /* counterintuitively this is the button color */
+    color: var(--background-color); /* counterintuitively this is the font color */
     border: var(--border-color);
     width: 91%;  /* via guess and check tbh, nothing principled */
     cursor: pointer;
