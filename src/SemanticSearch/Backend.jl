@@ -129,12 +129,12 @@ function Corpus(
     DBInterface.execute(
         db,
         """
-CREATE TABLE metadata (
-    idx INT PRIMARY KEY,
-    doc_name TEXT,
-    chunk TEXT
-)
-""",
+        CREATE TABLE metadata (
+            idx INT PRIMARY KEY,
+            doc_name TEXT,
+            chunk TEXT
+        )
+        """,
     )
 
     # don't initialize hnsw yet because it needs initial features
@@ -143,7 +143,9 @@ CREATE TABLE metadata (
     # if not in-memory only, save info about the corpus as a json
     if !isnothing(corpus_name)
         corpus_data =
-            Dict("embedder_model_path" => embedder_model_path, "max_seq_len" => max_seq_len)
+            Dict("embedder_model_path" => embedder_model_path, 
+            "max_seq_len" => max_seq_len
+        )
         json_str = JSON.json(corpus_data)
         corpus_data_path = "$(CURR_DIR)/files/$(corpus_name)_data.json"
         # test if the hnsw file exists
@@ -155,7 +157,6 @@ CREATE TABLE metadata (
             write(file, json_str)
         end
     end
-
     return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
 end
 
@@ -174,8 +175,6 @@ function load_corpus(corpus_name::String)
     try
         db_path = "$(CURR_DIR)/files/$(corpus_name).db"
         db = SQLite.DB(db_path)
-        hnsw_path = "$(CURR_DIR)/files/$(corpus_name).bin"
-        hnsw = open(deserialize, hnsw_path)
 
         # get corpus info from associated json
         corpus_data_path = "$(CURR_DIR)/files/$(corpus_name)_data.json"
@@ -186,36 +185,66 @@ function load_corpus(corpus_name::String)
         embedder = Embedder(embedder_model_path)
         max_seq_len = corpus_data["max_seq_len"]
 
-        return Corpus(corpus_name, db, hnsw, embedder, max_seq_len, [], 1)
+        data = []
+        hnsw = nothing
+        try
+            hnsw_path = "$(CURR_DIR)/files/$(corpus_name).bin"
+            hnsw = open(deserialize, hnsw_path)
+
+            # now we need to recover the corpus.data attribute that we 
+            # use to reindex
+            for embedding in hnsw.data
+                push!(data, embedding)
+            end
+        catch e
+            # this happens if the corpus hasn't been indexed yet
+            throw(error("Previously instantiated corpus had no index saved and must be re-created. To prevent this in the future, run a query on a new corpus before ending the session."))
+            
+            # partial solution that does not work yet: (TODO)
+            # so let's get all the chunks from the DB and index them
+            # unfortunately this may take a while
+
+            # query_result = DBInterface.execute(
+            #     db,
+            #     "SELECT chunk FROM metadata",
+            # )
+            # df = DataFrame(query_result)
+            # for chunk in df.chunks
+            #     embedding = embed(embedder, chunk)
+            #     push!(data, embedding)
+            # end
+        end
+
+        # figure out next_idx in case we want to upsert more later
+        query_result = DBInterface.execute(
+            db,
+            "SELECT MAX(idx) FROM metadata; SELECT MAX(idx)",
+        )
+
+        df = DataFrame(query_result)
+        max_idx = df[1, "MAX(idx)"]
+        next_idx = max_idx + 1
+        corpus = Corpus(corpus_name, db, hnsw, embedder, max_seq_len, data, next_idx)
+        return corpus
     catch e
+        println(e)
         if hasproperty(e, :msg)
-            throw(ArgumentError("Loading failed; corpus name not found.\n" + e.msg))
+            throw(error("Loading failed: $(e.msg)"))
         else
-            throw(ArgumentError("Loading failed; corpus name not found."))
+            throw(error("Loading failed; corpus name not found."))
         end
     end
 end
-
-"""
-    function generate_uuid()
-
-Generates a random UUID each call. May be OBE now, actually.
-"""
-function generate_uuid()
-    return string(UUIDs.uuid4()) # uuid4 should be completely random
-end
-
 
 """
     function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
 
 Given a new chunk of text, get embedding and insert into our vector DB.
 Not actually a full upsert, because we have to reindex later.
-Process: 
-1. Generate a uuid for the chunk
-2. Generate an embedding for the text
-3. Insert metadata into database
-4. Increment idx counter
+Process:
+1. Generate an embedding for the text
+2. Insert metadata into database
+3. Increment idx counter
 
 Parameters
 ----------
@@ -231,7 +260,7 @@ doc_name : str
 Notes
 -----
 If the vectors have been indexed, this de-indexes them (i.e., they need
-to be indexed again). Currentoy, we handle this by setting hnsw to 
+to be indexed again). Currently, we handle this by setting hnsw to 
 nothing so that it gets caught later in search.
 """
 function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
@@ -246,9 +275,9 @@ function upsert_chunk(corpus::Corpus, chunk::String, doc_name::String)
     DBInterface.execute(
         corpus.db,
         """
-INSERT INTO metadata (idx, doc_name, chunk) 
-VALUES (?, ?, ?)
-""",
+        INSERT INTO metadata (idx, doc_name, chunk) 
+        VALUES (?, ?, ?)
+        """,
         (corpus.next_idx, doc_name, chunk),
     )
 
@@ -370,6 +399,7 @@ end
     function index(corpus::Corpus)
 
 Constructs the HNSW vector index from the data available.
+If the corpus has a corpus_name, then we also save the new index to disk.
 Must be run before searching.
 
 Parameters

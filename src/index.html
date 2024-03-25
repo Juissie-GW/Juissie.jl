@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <meta charset = "UTF-8">
+    <!-- TODO: consider removing viewport meta tag, because it's probably not necessary, even though it seems standard -->
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    <title>🥝 Juissie Desktop</title>
+    <link rel = "stylesheet" href = "style.css">
+</head>
+<body>
+    <div class = "container">
+        <!-- LEFT PANEL -->
+        <div class = "search-area">
+            <input type = "text" id= "search-bar" placeholder = "Ask Juissie about your corpus...">
+            <button id = "search-button">Ask Juissie</button>
+            <div id = "response-field"></div>
+            <div id = "citations-field"></div>
+        </div>
+        
+        <!-- RIGHT PANEL -->
+        <div class = "corpus-manager">
+            <h3>Corpus Manager</h3>
+            <br>
+
+            <div class = "tabs">
+                <button class = "tab-button active" onclick = "click_tab('existing')">Existing</button>
+                <button class = "tab-button" onclick = "click_tab('new')">New</button>
+                <button class = "tab-button" onclick = "click_tab('api-key')">API Key</button>
+            </div>
+
+            <!-- content for the Existing tab (load an existing generator/corpus) -->
+            <div id = "existing" class = "tab-content">
+                <select id = "corpus-name"></select>
+                <button id = "load-button">Load</button>
+            </div>
+
+            <!-- content for the New tab (create a new generator/corpus) -->
+            <div id = "new" class = "tab-content" style = "display: none;">
+                <input type = "text" id = "new-corpus-name" placeholder = "Corpus Name">
+                <button id = "create-button">Create</button>
+                <input type = "text" id = "url-field" placeholder = "URL">
+                <input type = "text" id = "document-name-field" placeholder = "Document Name">
+                <button id = "upsert-button">Upsert</button>
+            </div>
+
+            <!-- content for the API Key tab (just for storing/updating the key) -->
+            <div id = "api-key" class = "tab-content" style = "display: none;">
+                <input type = "text" id = "api-key-field" placeholder = "OpenAI API Key">
+                <button id = "update-key-button">Update API Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- convoluted javascript for button actions, etc. -->
+    <!-- TODO: pull this out in a separate js file for cleanliness -->
+    <script>
+        // the existing tab is clicked at startup
+        // DOMContentLoaded event executes when we're done parsing the HTML content
+        document.addEventListener("DOMContentLoaded", function() {
+            click_tab("existing");
+        });
+        
+        // defining the functional behavior we want from buttons and fields
+        // this consists of hitting the internal API endpoints, etc.
+
+        /**
+         * Iterate through corpus_names and add each to the dropdown menu
+         */
+        function build_corpus_dropdown(corpus_names) {
+            var dropdown = document.getElementById("corpus-name");
+            dropdown.innerHTML = "";
+            corpus_names.forEach(name => {
+                var corpus = document.createElement("option");
+                corpus.value = name;
+                corpus.textContent = name;
+                dropdown.appendChild(corpus);
+            });
+        }
+
+        /**
+         * Handles tab-switching logic - clearing previous tab's content
+         * and loading new content, etc.
+         */
+        function click_tab(tab_name) {
+            var i;
+            // make the previous tab inactive
+            // we don't know which one this is, so just iterate over all three
+            var buttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].className = buttons[i].className.replace(" active", "");
+            }
+            // clear the content from the previous tab
+            var content = document.getElementsByClassName("tab-content");
+            for (i = 0; i < content.length; i++) {
+                content[i].style.display = "none";
+            }
+            
+            event.currentTarget.className += " active"; // mark the current tab as active
+            document.getElementById(tab_name).style.display = "block"; // show content for the current tab
+        }
+
+        /**
+         * Handles the search/query button logic - hits the generate API
+         * endpoint with a post request, and fills the response and 
+         * citations fields with the result
+         */
+        function search() {
+            var query = document.getElementById("search-bar").value;
+            var response_field = document.getElementById("response-field");
+            var citations_field = document.getElementById("citations-field");
+
+            // clear out the response and citations fields
+            response_field.innerHTML = "";
+            citations_field.innerHTML = "";
+
+            fetch(
+                "http://127.0.0.1:8000/generate",
+                {
+                    method: "POST",
+                    body: query
+                }
+            )
+            .then(response => response.json())
+            .then(data => {
+                response_field.innerHTML = data.result;
+                citations_field.innerHTML = data.doc_names.join("<br>"); // add a newline character after each citation for readability
+            })
+            .catch(error => {
+                alert("Juissie encountered an error in generation");
+            });
+        }
+
+        /**
+         * Updates the OAI_KEY global variable in Frontend.jl by hitting the
+         * corresponding API endpoint.
+         */
+        function update_api_key() {
+            var api_key = document.getElementById("api-key-field").value;
+            fetch(
+                "http://127.0.0.1:8000/update_api_key",
+                {
+                    method: "POST",
+                    body: api_key
+                }
+            )
+            .then(response => response.json())
+            .then(data => {alert(data.message);});
+        }
+
+        /**
+         * Given a URL and document name, we use read the HTML content, chunkify
+         * it, and upsert those chunks to our vector DB
+         */
+        function upsert_document() {
+            var url = document.getElementById("url-field").value;
+            var document_name = document.getElementById("document-name-field").value;
+            if (url != "" && document_name != "") {
+                var payload = {
+                    url: url,
+                    doc_title: document_name
+                };
+                fetch(
+                    "http://127.0.0.1:8000/upsert_document",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                )
+                .then(response => response.json())
+                .then(data => {alert(data.message);});
+            } else {
+                alert("Error upserting: Juissie needs both a URL and document title to upsert");
+            }
+        }
+
+        /**
+         * Loads a GeneratorWithCorpus object selected from the dropdown
+         * menu
+         */
+        function load_generator() {
+            var corpus_name = document.getElementById("corpus-name").value;
+            fetch(
+                "http://127.0.0.1:8000/load_generator",
+                {
+                    method: "POST",
+                    body: corpus_name
+                }
+            )
+            .then(response => response.json())
+            .then(data => {alert(data.message);});
+        }
+
+        /**
+         * Creates a new GeneratorWithCorpus object from scratch. The corpus
+         * part can either be in-memory (if the user doesn't provide a name)
+         * or on-disk (otherwise).
+         */
+        function create_generator() {
+            var corpus_name = document.getElementById("new-corpus-name").value;
+            fetch(
+                "http://127.0.0.1:8000/create_generator",
+                {
+                    method: "POST",
+                    body: corpus_name
+                }
+            )
+            .then(response => response.json())
+            .then(data => {alert(data.message);});
+        }
+
+        // now applying the above functions to our UI elements
+
+        // execute automatically
+        fetch("http://127.0.0.1:8000/corpus_names")
+        .then(response => response.json())
+        .then(data => {build_corpus_dropdown(data.corpus_names);});
+        
+        // execute on button click only
+        document.getElementById("load-button")
+        .addEventListener("click", load_generator);
+
+        // execute on button click only
+        document.getElementById("create-button")
+        .addEventListener("click", create_generator);
+
+        // execute on both button click and hitting enter from the appropriate text field
+        document.getElementById("update-key-button")
+        .addEventListener("click", update_api_key);
+        document.getElementById("api-key-field")
+        .addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                update_api_key();
+            }
+        });
+        
+        // execute on both button click and hitting enter from the appropriate text field
+        document.getElementById("search-button").addEventListener("click", search);
+        document.getElementById("search-bar")
+        .addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                search();
+            }
+        });
+        
+        // execute on both button click and hitting enter from the appropriate text field
+        document.getElementById("upsert-button")
+        .addEventListener("click", upsert_document);
+        document.getElementById("document-name-field")
+        .addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                upsert_document();
+            }
+        });
+    </script>
+</body>
+</html>
