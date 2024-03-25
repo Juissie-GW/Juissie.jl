@@ -17,12 +17,42 @@ export OAIGenerator,
     upsert_document_to_generator,
     upsert_document_from_url_to_generator,
     load_OAIGeneratorWithCorpus,
-    GeneratorWithCorpus
+    GeneratorWithCorpus,
+    check_oai_key_format
 
 
 const OptionalContext = Union{Vector{String},Nothing}
 abstract type Generator end
 abstract type GeneratorWithCorpus <: Generator end
+
+"""
+    function check_oai_key_format(key::String)
+
+Uses regex to check if a provided string is in the expected format of an OpenAI
+    API Key
+
+Parameters
+----------
+key : String
+    the key you want to check
+
+Notes
+-----
+See here for more on the regex:
+- https://en.wikibooks.org/wiki/Introducing_Julia/Strings_and_characters#Finding_and_replacing_things_inside_strings
+
+Uses format rule provided here:
+- https://github.com/secretlint/secretlint/issues/676
+- https://community.openai.com/t/what-are-the-valid-characters-for-the-apikey/288643
+
+Note that this only checks the key format, not whether the key is valid or has not 
+been revoked.
+"""
+function check_oai_key_format(key::String)
+    pattern = r"^sk-[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}$"
+    result = occursin(pattern, key)
+    return result
+end
 
 """
     struct OAIGenerator
@@ -119,7 +149,10 @@ function OAIGenerator(auth_token::Union{String,Nothing} = nothing)
     end
 
     url = "https://api.openai.com/v1/chat/completions"
-    header = ["Content-Type" => "application/json", "Authorization" => "Bearer $auth_token"]
+    header = [
+        "Content-Type" => "application/json", 
+        "Authorization" => "Bearer $auth_token"
+    ]
     body = Dict("model" => "gpt-3.5-turbo")
 
     return OAIGenerator(url, header, body)
