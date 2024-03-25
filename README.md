@@ -2,6 +2,8 @@
 
 Juissie is a Julia-native semantic query engine. It can be used as a package in software development workflows, or via its desktop user interface.
 
+Juissie was developed as a class project for CSCI 6221: Advanced Software Paradigms at The George Washington University.
+
 ## Table of Contents
 * [Table of Contents](#table-of-contents)
 * [Getting Started](#getting-started)
