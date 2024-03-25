@@ -50,8 +50,7 @@ been revoked.
 """
 function check_oai_key_format(key::String)
     pattern = r"^sk-[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}$"
-    result = occursin(pattern, key)
-    return result
+    return occursin(pattern, key)
 end
 
 """
