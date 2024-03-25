@@ -45,7 +45,7 @@
 
             <!-- content for the API Key tab (just for storing/updating the key) -->
             <div id = "api-key" class = "tab-content" style = "display: none;">
-                <input type = "text" id = "api-key-field" placeholder = "OpenAI API Key">
+                <input type = "password" id = "api-key-field" placeholder = "OpenAI API Key">
                 <button id = "update-key-button">Update API Key</button>
             </div>
         </div>
@@ -144,7 +144,13 @@
                 }
             )
             .then(response => response.json())
-            .then(data => {alert(data.message);});
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else if (data.error) {
+                    alert("Error: " + data.error);
+                }
+            });
         }
 
         /**
@@ -222,7 +228,6 @@
         document.getElementById("load-button")
         .addEventListener("click", load_generator);
 
-        // execute on button click only
         document.getElementById("create-button")
         .addEventListener("click", create_generator);
 
@@ -237,7 +242,6 @@
             }
         });
         
-        // execute on both button click and hitting enter from the appropriate text field
         document.getElementById("search-button").addEventListener("click", search);
         document.getElementById("search-bar")
         .addEventListener("keypress", function(event) {
@@ -247,7 +251,6 @@
             }
         });
         
-        // execute on both button click and hitting enter from the appropriate text field
         document.getElementById("upsert-button")
         .addEventListener("click", upsert_document);
         document.getElementById("document-name-field")

@@ -28,6 +28,8 @@ code : Int
     status code for the response. in our case, one of the following:
         - 200 (success)
         - 500 (failure)
+message : String
+    the textual body you want to send
 """
 function simple_response(code::Int, message::String)
     content_type_json = ["Content-Type" => "application/json"]
@@ -57,13 +59,17 @@ Helper function to throw an HTTP response with a textual message
 
 Parameters
 ----------
+code : Int
+    status code for the response. in our case, one of the following:
+        - 200 (success)
+        - 500 (failure)
 payload : JSON body
     a JSON-ified dictionary for the response body
 """
-function json_response(payload)
+function json_response(code::Int, payload)
     content_type_json = ["Content-Type" => "application/json"]
     return HTTP.Response(
-        200,
+        code,
         content_type_json, 
         payload
     )
@@ -96,7 +102,7 @@ function handle_corpus_names()
         corpus_names = get_corpus_names()
         response_dict = Dict("corpus_names" => corpus_names)
         payload = JSON.json(response_dict)
-        return json_response(payload)
+        return json_response(200, payload)
     catch e
         return simple_response(500, "Juissie could not find any local corpora: $e")
     end
@@ -148,7 +154,7 @@ function handle_generate(generator::GeneratorWithCorpus, request::HTTP.Request)
             "doc_names" => unique(doc_names)
         )
         payload = JSON.json(convert(Dict{String, Any}, response_dict))
-        return json_response(payload)
+        return json_response(200, payload)
     catch e
         return simple_response(500, "Juissie could not generate a response: $e")
     end
@@ -218,10 +224,14 @@ request : HTTP.Request
 """
 function handle_update_api_key(request::HTTP.Request)
     try
-        OAI_KEY = String(request.body)
-        return OAI_KEY, simple_response(200, "Your API Key has been updated successfully")
+        key = String(request.body)
+        if !check_oai_key_format(key)
+            throw(error("OpenAI key does not match the expected format."))
+        end
+        return key, simple_response(200, "Your API Key has been updated successfully")
     catch e
-        return nothing, simple_response(500, "Juissie could not update the API key: $e")
+        payload = JSON.json(Dict("error" => "Juissie could not update the API key: $(e.msg)"))
+        return nothing, json_response(500, payload)
     end
 end
 
