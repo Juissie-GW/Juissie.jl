@@ -8,6 +8,7 @@
     --text-color: #FFFFFF; /* this is just white */
     --border-color: #868494; /* this is for outlines and subdued/temp fonts */
     --button-color: #FF79C6; /* spacey-looking pink buttons */
+    --button-color-active: #FED6ED;
     --tiny-px: 1px;  /* border size */
     --small-px: 10px; /* padding for small elements like text boxes and buttons */
     --medium-px: 20px; /* padding for large elements like containers */
@@ -67,6 +68,10 @@ body {
     color: var(--background-color);
     border: var(--border-color);
     cursor: pointer;
+}
+
+.left-panel-button.active {
+    background-color: var(--button-color-active); /* switch to a lighter button color */
 }
 
 #response-field {
@@ -161,4 +166,8 @@ body {
     border: var(--border-color);
     width: 91%;  /* via guess and check tbh, nothing principled */
     cursor: pointer;
+}
+
+.right-panel-button.active {
+    background-color: var(--button-color-active); /* switch to a lighter button color */
 }
