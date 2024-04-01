@@ -12,7 +12,7 @@
         <!-- LEFT PANEL -->
         <div class = "search-area">
             <input type = "text" id= "search-bar" placeholder = "Ask Juissie about your corpus...">
-            <button id = "search-button">Ask Juissie</button>
+            <button id = "search-button" class = "left-panel-button">Ask Juissie</button>
             <div id = "response-field"></div>
             <div id = "citations-field"></div>
         </div>
@@ -23,33 +23,33 @@
             <br>
 
             <div class = "tabs">
-                <button class = "tab-button active" onclick = "click_tab('existing')">Existing</button>
-                <button class = "tab-button" onclick = "click_tab('new')">New</button>
-                <button class = "tab-button" onclick = "click_tab('api-key')">API Key</button>
+                <button id = "existing-tab-button" class = "tab-button active" onclick = "click_tab('existing')">Existing</button>
+                <button id = "new-tab-button" class = "tab-button" onclick = "click_tab('new')">New</button>
+                <button id = "api-key-button" class = "tab-button" onclick = "click_tab('api-key')">API Key</button>
             </div>
 
             <!-- content for the Existing tab (load an existing generator/corpus) -->
             <div id = "existing" class = "tab-content">
                 <select id = "corpus-name"></select>
-                <button id = "load-button">Load</button>
+                <button id = "load-button" class = "right-panel-button">Load</button>
                 <input type = "text" id = "url-field" placeholder = "URL">
                 <input type = "text" id = "document-name-field" placeholder = "Document Name">
-                <button id = "upsert-button">Upsert</button>
+                <button id = "upsert-button" class = "right-panel-button">Upsert</button>
             </div>
 
             <!-- content for the New tab (create a new generator/corpus) -->
             <div id = "new" class = "tab-content" style = "display: none;">
-                <input type = "text" id = "new-corpus-name" placeholder = "Corpus Name">
-                <button id = "create-button">Create</button>
-                <input type = "text" id = "url-field" placeholder = "URL">
-                <input type = "text" id = "document-name-field" placeholder = "Document Name">
-                <button id = "upsert-button">Upsert</button>
+                <input type = "text" id = "new-corpus-name" class = "right-panel-text-field" placeholder = "Corpus Name">
+                <button id = "create-button" class = "right-panel-button">Create</button>
+                <input type = "text" id = "url-field" class = "right-panel-text-field" placeholder = "URL">
+                <input type = "text" id = "document-name-field" class = "right-panel-text-field" placeholder = "Document Name">
+                <button id = "upsert-button" class = "right-panel-button">Upsert</button>
             </div>
 
             <!-- content for the API Key tab (just for storing/updating the key) -->
             <div id = "api-key" class = "tab-content" style = "display: none;">
-                <input type = "password" id = "api-key-field" placeholder = "OpenAI API Key">
-                <button id = "update-key-button">Update API Key</button>
+                <input type = "password" id = "api-key-field" class = "right-panel-text-field" placeholder = "OpenAI API Key">
+                <button id = "update-key-button" class = "right-panel-button">Update API Key</button>
             </div>
         </div>
     </div>

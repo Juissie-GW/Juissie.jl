@@ -58,7 +58,8 @@ body {
     border: var(--tiny-px) solid var(--border-color);
 }
 
-#search-button {
+/* currently just the search button */
+.left-panel-button {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
     padding: var(--small-px);
@@ -139,7 +140,7 @@ body {
 }
 
 /* any right-panel free text field */
-#new-corpus-name, #url-field, #document-name-field, #api-key-field {
+.right-panel-text-field {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
     padding: var(--small-px);
@@ -151,7 +152,7 @@ body {
 }
 
 /* any right-panel non-tab button */
-#load-button, #create-button, #upsert-button, #update-key-button {
+.right-panel-button {
     font-family: var(--default-font);
     margin: var(--small-px);
     padding: var(--small-px);
