@@ -219,6 +219,9 @@
             .then(data => {
                 alert(data.message);
                 button.classList.remove("active");
+            })
+            .catch(error => {
+                alert("Juissie encountered an error loading the corpus and/or generator.");
             });
         }
 
@@ -242,6 +245,9 @@
             .then(data => {
                 alert(data.message);
                 button.classList.remove("active");
+            })
+            .catch(error => {
+                alert("Juissie encountered an error creating the corpus and/or generator.");
             });
         }
 
