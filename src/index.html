@@ -12,7 +12,7 @@
         <!-- LEFT PANEL -->
         <div class = "search-area">
             <input type = "text" id= "search-bar" placeholder = "Ask Juissie about your corpus...">
-            <button id = "search-button">Ask Juissie</button>
+            <button id = "search-button" class = "left-panel-button">Ask Juissie</button>
             <div id = "response-field"></div>
             <div id = "citations-field"></div>
         </div>
@@ -23,30 +23,33 @@
             <br>
 
             <div class = "tabs">
-                <button class = "tab-button active" onclick = "click_tab('existing')">Existing</button>
-                <button class = "tab-button" onclick = "click_tab('new')">New</button>
-                <button class = "tab-button" onclick = "click_tab('api-key')">API Key</button>
+                <button id = "existing-tab-button" class = "tab-button active" onclick = "click_tab('existing')">Existing</button>
+                <button id = "new-tab-button" class = "tab-button" onclick = "click_tab('new')">New</button>
+                <button id = "api-key-button" class = "tab-button" onclick = "click_tab('api-key')">API Key</button>
             </div>
 
             <!-- content for the Existing tab (load an existing generator/corpus) -->
             <div id = "existing" class = "tab-content">
                 <select id = "corpus-name"></select>
-                <button id = "load-button">Load</button>
+                <button id = "load-button" class = "right-panel-button">Load</button>
+                <input type = "text" id = "url-field" class = "right-panel-text-field" placeholder = "URL">
+                <input type = "text" id = "document-name-field" class = "right-panel-text-field" placeholder = "Document Name">
+                <button id = "upsert-button" class = "right-panel-button">Upsert</button>
             </div>
 
             <!-- content for the New tab (create a new generator/corpus) -->
             <div id = "new" class = "tab-content" style = "display: none;">
-                <input type = "text" id = "new-corpus-name" placeholder = "Corpus Name">
-                <button id = "create-button">Create</button>
-                <input type = "text" id = "url-field" placeholder = "URL">
-                <input type = "text" id = "document-name-field" placeholder = "Document Name">
-                <button id = "upsert-button">Upsert</button>
+                <input type = "text" id = "new-corpus-name" class = "right-panel-text-field" placeholder = "Corpus Name">
+                <button id = "create-button" class = "right-panel-button">Create</button>
+                <input type = "text" id = "url-field" class = "right-panel-text-field" placeholder = "URL">
+                <input type = "text" id = "document-name-field" class = "right-panel-text-field" placeholder = "Document Name">
+                <button id = "upsert-button" class = "right-panel-button">Upsert</button>
             </div>
 
             <!-- content for the API Key tab (just for storing/updating the key) -->
             <div id = "api-key" class = "tab-content" style = "display: none;">
-                <input type = "password" id = "api-key-field" placeholder = "OpenAI API Key">
-                <button id = "update-key-button">Update API Key</button>
+                <input type = "password" id = "api-key-field" class = "right-panel-text-field" placeholder = "OpenAI API Key">
+                <button id = "update-key-button" class = "right-panel-button">Update API Key</button>
             </div>
         </div>
     </div>
@@ -84,11 +87,12 @@
         function click_tab(tab_name) {
             var i;
             // make the previous tab inactive
-            // we don't know which one this is, so just iterate over all three
+            // we don't know which one this is, so just iterate over all three to check
             var buttons = document.getElementsByClassName("tab-button");
             for (i = 0; i < buttons.length; i++) {
                 buttons[i].className = buttons[i].className.replace(" active", "");
             }
+
             // clear the content from the previous tab
             var content = document.getElementsByClassName("tab-content");
             for (i = 0; i < content.length; i++) {
@@ -105,6 +109,8 @@
          * citations fields with the result
          */
         function search() {
+            var button = document.getElementById("search-button");
+            button.classList.add("active");
             var query = document.getElementById("search-bar").value;
             var response_field = document.getElementById("response-field");
             var citations_field = document.getElementById("citations-field");
@@ -124,9 +130,11 @@
             .then(data => {
                 response_field.innerHTML = data.result;
                 citations_field.innerHTML = data.doc_names.join("<br>"); // add a newline character after each citation for readability
+                button.classList.remove("active")
             })
             .catch(error => {
                 alert("Juissie encountered an error in generation");
+                button.classList.remove("active");
             });
         }
 
@@ -135,6 +143,8 @@
          * corresponding API endpoint.
          */
         function update_api_key() {
+            var button = document.getElementById("update-key-button");
+            button.classList.add("active");
             var api_key = document.getElementById("api-key-field").value;
             fetch(
                 "http://127.0.0.1:8000/update_api_key",
@@ -147,8 +157,10 @@
             .then(data => {
                 if (data.message) {
                     alert(data.message);
+                    button.classList.remove("active");
                 } else if (data.error) {
                     alert("Error: " + data.error);
+                    button.classList.remove("active");
                 }
             });
         }
@@ -158,6 +170,8 @@
          * it, and upsert those chunks to our vector DB
          */
         function upsert_document() {
+            var button = document.getElementById("upsert-button");
+            button.classList.add("active");
             var url = document.getElementById("url-field").value;
             var document_name = document.getElementById("document-name-field").value;
             if (url != "" && document_name != "") {
@@ -176,9 +190,13 @@
                     }
                 )
                 .then(response => response.json())
-                .then(data => {alert(data.message);});
+                .then(data => {
+                    alert(data.message);
+                    button.classList.remove("active");
+                });
             } else {
                 alert("Error upserting: Juissie needs both a URL and document title to upsert");
+                button.classList.remove("active");
             }
         }
 
@@ -187,6 +205,8 @@
          * menu
          */
         function load_generator() {
+            var button = document.getElementById("load-button");
+            button.classList.add("active");
             var corpus_name = document.getElementById("corpus-name").value;
             fetch(
                 "http://127.0.0.1:8000/load_generator",
@@ -196,7 +216,13 @@
                 }
             )
             .then(response => response.json())
-            .then(data => {alert(data.message);});
+            .then(data => {
+                alert(data.message);
+                button.classList.remove("active");
+            })
+            .catch(error => {
+                alert("Juissie encountered an error loading the corpus and/or generator.");
+            });
         }
 
         /**
@@ -205,6 +231,8 @@
          * or on-disk (otherwise).
          */
         function create_generator() {
+            var button = document.getElementById("create-button");
+            button.classList.add("active");
             var corpus_name = document.getElementById("new-corpus-name").value;
             fetch(
                 "http://127.0.0.1:8000/create_generator",
@@ -214,52 +242,59 @@
                 }
             )
             .then(response => response.json())
-            .then(data => {alert(data.message);});
+            .then(data => {
+                alert(data.message);
+                button.classList.remove("active");
+            })
+            .catch(error => {
+                alert("Juissie encountered an error creating the corpus and/or generator.");
+            });
         }
 
         // now applying the above functions to our UI elements
 
         // execute automatically
         fetch("http://127.0.0.1:8000/corpus_names")
-        .then(response => response.json())
-        .then(data => {build_corpus_dropdown(data.corpus_names);});
+            .then(response => response.json())
+            .then(data => {build_corpus_dropdown(data.corpus_names);});
         
         // execute on button click only
         document.getElementById("load-button")
-        .addEventListener("click", load_generator);
+            .addEventListener("click", load_generator);
 
         document.getElementById("create-button")
-        .addEventListener("click", create_generator);
+            .addEventListener("click", create_generator);
 
         // execute on both button click and hitting enter from the appropriate text field
         document.getElementById("update-key-button")
-        .addEventListener("click", update_api_key);
+            .addEventListener("click", update_api_key);
         document.getElementById("api-key-field")
-        .addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                update_api_key();
-            }
-        });
+            .addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    update_api_key();
+                }
+            });
         
-        document.getElementById("search-button").addEventListener("click", search);
+        document.getElementById("search-button")
+            .addEventListener("click", search);
         document.getElementById("search-bar")
-        .addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                search();
-            }
-        });
+            .addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    search();
+                }
+            });
         
         document.getElementById("upsert-button")
-        .addEventListener("click", upsert_document);
+            .addEventListener("click", upsert_document);
         document.getElementById("document-name-field")
-        .addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                upsert_document();
-            }
-        });
+            .addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    upsert_document();
+                }
+            });
     </script>
 </body>
 </html>

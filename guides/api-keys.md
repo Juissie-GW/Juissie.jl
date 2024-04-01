@@ -5,7 +5,7 @@ Secure management of secret keys is important. Every user should create a `.env`
 OAI_KEY=ABC123
 ```
 
-These may be accessed using Julia via the `DotEnv` library. First, install `DotEnv`:
+These may be accessed using Julia via the `DotEnv` library. First, run the `julia` command in a terminal. Then install `DotEnv`:
 ```julia
 import Pkg
 Pkg.add("DotEnv")
@@ -18,11 +18,12 @@ cfg = DotEnv.config()
 api_key = cfg["OAI_KEY"]
 ```
 
-Note that DotEnv looks for `.env` in the *current* directory, i.e. that of the calling function. If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YOUR_PATH_HERE)`
+Note that DotEnv looks for `.env` in the *current* directory, i.e. that of where you called `julia` from. 
+If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YOUR_PATH_HERE)`
 
 
 ## Obtaining an OpenAI API Key
 
 1. Create an OpenAI account [here](https://auth0.openai.com/u/signup).
 2. Set up billing information (each query has a small cost) [here](https://platform.openai.com/account/billing/payment-methods).
-3. Create a new sectet key [here](https://platform.openai.com/api-keys).
+3. Create a new secret key [here](https://platform.openai.com/api-keys).

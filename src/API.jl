@@ -86,7 +86,7 @@ function get_corpus_names()
     backend_file_names = readdir(backend_files_dir)
     backend_file_names_stripped = [splitext(f)[1] for f in backend_file_names]
     corpus_names = [replace(f, "_data" => "") for f in backend_file_names_stripped]
-    corpus_names_unique = unique(corpus_names)
+    corpus_names_unique = [f for f in unique(corpus_names) if f!=".DS_Store"]
     return corpus_names_unique
 end
 

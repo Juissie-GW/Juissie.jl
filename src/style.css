@@ -8,6 +8,7 @@
     --text-color: #FFFFFF; /* this is just white */
     --border-color: #868494; /* this is for outlines and subdued/temp fonts */
     --button-color: #FF79C6; /* spacey-looking pink buttons */
+    --button-color-active: #FED6ED;
     --tiny-px: 1px;  /* border size */
     --small-px: 10px; /* padding for small elements like text boxes and buttons */
     --medium-px: 20px; /* padding for large elements like containers */
@@ -58,7 +59,8 @@ body {
     border: var(--tiny-px) solid var(--border-color);
 }
 
-#search-button {
+/* currently just the search button */
+.left-panel-button {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
     padding: var(--small-px);
@@ -66,6 +68,10 @@ body {
     color: var(--background-color);
     border: var(--border-color);
     cursor: pointer;
+}
+
+.left-panel-button.active {
+    background-color: var(--button-color-active); /* switch to a lighter button color */
 }
 
 #response-field {
@@ -139,7 +145,7 @@ body {
 }
 
 /* any right-panel free text field */
-#new-corpus-name, #url-field, #document-name-field, #api-key-field {
+.right-panel-text-field {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
     padding: var(--small-px);
@@ -151,7 +157,7 @@ body {
 }
 
 /* any right-panel non-tab button */
-#load-button, #create-button, #upsert-button, #update-key-button {
+.right-panel-button {
     font-family: var(--default-font);
     margin: var(--small-px);
     padding: var(--small-px);
@@ -160,4 +166,8 @@ body {
     border: var(--border-color);
     width: 91%;  /* via guess and check tbh, nothing principled */
     cursor: pointer;
+}
+
+.right-panel-button.active {
+    background-color: var(--button-color-active); /* switch to a lighter button color */
 }

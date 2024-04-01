@@ -14,10 +14,12 @@ pip install -r requirements.txt
 ```julia
 using Pkg
 Pkg.add("IJulia")
+exit()
 ```
 
-3. Launch a Jupyter session from the terminal:
+3. Launch a Jupyter session from the terminal, where `<notebook>` is the path to the notebook to run:
 ```bash
-jupyter notebook
+jupyter <notebook>
 ```
+
 4. When you create a new notebook, select a Julia kernel.

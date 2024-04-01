@@ -4,22 +4,23 @@
 2. Navigate into the cloned repo directory:
 
 ```bash
-cd Juissie.jl
+cd Juissie
 ```
 
-In general, we assume the user is running `julia` other other commands (e.g., `jupyter notebook`) from the root level of this project.
+In general, we assume the user is running the `julia` command, and all other commands (e.g., `jupyter notebook`), from the root level of this project.
 
-3. Open the Julia REPL by typing 'julia' into the terminal. Then, install the package dependencies:
+3. Open the Julia REPL by typing `julia` into the terminal. Then, install the package dependencies:
 
 ```julia
 using Pkg
 Pkg.activate(".")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 
 # Verify Setup
 
-1. From this repo's home directory, open the Julia REPL by typing 'julia' into the terminal. Then, try importing the Juissie module:
+1. From this repo's home directory, open the Julia REPL by typing `julia` into the terminal. Then, try importing the Juissie module:
 
 ```julia
 using Juissie
@@ -27,15 +28,13 @@ using Juissie
 
 This should expose symbols like `Corpus`, `Embedder`, `upsert_chunk`, `upsert_document`, `search`, and `embed`.
 
-2. Try instantiating one of the exported structs, like `Corpus`:
+2. Try instantiating one of the exported struct, like `Corpus`:
 
 ```julia
 corpus = Corpus()
 ```
 
-We can test the upsert and search functionality associated with `Corpus` like so:
-
-Upsert some chunks to the vector database:
+We can test the `upsert` and search functionality associated with `Corpus` like so:
 
 ```julia
 upsert_chunk(corpus, "Hold me closer, tiny dancer.", "doc1")

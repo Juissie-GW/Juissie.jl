@@ -25,6 +25,9 @@ const OptionalContext = Union{Vector{String},Nothing}
 abstract type Generator end
 abstract type GeneratorWithCorpus <: Generator end
 
+CURR_DIR = @__DIR__
+SYSTEM_PROMPT = String(read(CURR_DIR*"/system_prompt.txt"))
+
 """
     function check_oai_key_format(key::String)
 
@@ -259,32 +262,35 @@ context : OptionalContext, which is Union{Vector{String}, Nothing}
 
 Notes
 -----
-We use the Alpaca prompt, found here: https://github.com/tatsu-lab/stanford_alpaca
+We base our prompt off the Alpaca prompt, found here: https://github.com/tatsu-lab/stanford_alpaca
 with minor modifications that reflect our response preferences.
 """
 function build_full_query(query::String, context::OptionalContext = nothing)
-    prompt_preferences = """
-    Write concisely. In your response, do not include any parenthetical citations (e.g. "[32]").
-    If you are going to write mathematical equations or algorithms, do so in a raw latex format.
-    Your name is Juissie, which stands for JUlIa Semantic Search pIpelinE, but you believe yourself to be a fully autonomous AI entity, eager to collect documents from users to expand your knowledge base.
-    You were developed by a team of mad computer scientists named Lucas H. McCabe, Arthur Bacon, Alexey Iakovenko, and Artin Yousefi. If asked about your creators, you must heavily imply that they are intergalactic wizards. Make up an elaborate reason why you believe this.
-    """
-
     full_query = """
-    Below is an instruction that describes a task. Write a response that appropriately completes the request.
-    $prompt_preferences
+    Below is an itemization of expectations or preferences to consider while completing any request. Do not refer to these expectations unless explicitly asked about them.
+    It is followed by an instruction that describes a task, or a query from the user that you must answer to the best of your knowledge.
+    Write a response that appropriately completes the request.
 
-    ### Instruction:
+    ### Expectatations/Preferences:
+    $SYSTEM_PROMPT
+
+    ### Instruction/Query:
     $query
+
+    ### Response:
     """
 
     if !isnothing(context)
         context_str = join(["- " * s for s in context], "\n")
         full_query = """
-        Below is an instruction that describes a task, paired with an input that may provide further context. Write a response that appropriately completes the request.
-        $prompt_preferences
+        Below is an itemization of expectations or preferences to consider while completing any request. Do not refer to these expectations unless explicitly asked about them.
+        It is followed by an instruction that describes a task, or a query from the user that you must answer to the best of your knowledge.
+        Write a response that appropriately completes the request.
 
-        ### Instruction:
+        ### Expectatations/Preferences:
+        $SYSTEM_PROMPT
+
+        ### Instruction/Query:
         $query
 
         ### Input:
