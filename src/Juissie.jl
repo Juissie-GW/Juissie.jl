@@ -13,7 +13,8 @@ export Corpus,
     upsert_document_from_txt,
     search,
     Embedder,
-    embed
+    embed,
+    cosine_similarity
 
 using .Generation
 export OAIGenerator,

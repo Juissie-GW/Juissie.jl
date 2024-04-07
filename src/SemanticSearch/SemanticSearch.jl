@@ -18,7 +18,7 @@ export Corpus,
     load_corpus
 
 using .Embedding
-export Embedder, embed
+export Embedder, embed, cosine_similarity
 
 using .TextUtils
 export chunkify

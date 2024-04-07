@@ -2,11 +2,12 @@
 
 module Embedding
 
+using LinearAlgebra
 using Transformers
 using Transformers.TextEncoders
 using Transformers.HuggingFace
 
-export Embedder, embed
+export Embedder, embed, cosine_similarity
 
 
 """
@@ -105,5 +106,23 @@ function embed_from_bert(embedder::Embedder, text::String)
     cls_embedding = model_output.hidden_state[:, 1, :] # Grab the 1st item in the 2nd Dimention
     return cls_embedding
 end # function embed_from_bert
+
+"""
+    function cosine_similarity(vector_1::Vector{Float64}, vector_2::Vector{Float64})
+
+Computes the cosine similarity between two vectors/embeddings. This is a normalized dot product.
+
+Parameters
+----------
+vector_1 : Union{Vector{Float32}, Vector{Float64}}
+    the first vector/embedding
+vector_2 : Union{Vector{Float32}, Vector{Float64}}
+    the second vector/embedding
+"""
+function cosine_similarity(vector_1::Union{Vector{Float32}, Vector{Float64}}, vector_2::Union{Vector{Float32}, Vector{Float64}})
+    dot_product = dot(vector_1, vector_2)
+    normalization = sqrt(dot(vector_1, vector_1)) * sqrt(dot(vector_2, vector_2))
+    return dot_product / normalization
+end
 
 end # module Embedding
