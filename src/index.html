@@ -32,18 +32,18 @@
             <div id = "existing" class = "tab-content">
                 <select id = "corpus-name"></select>
                 <button id = "load-button" class = "right-panel-button">Load</button>
-                <input type = "text" id = "url-field" class = "right-panel-text-field" placeholder = "URL">
-                <input type = "text" id = "document-name-field" class = "right-panel-text-field" placeholder = "Document Name">
-                <button id = "upsert-button" class = "right-panel-button">Upsert</button>
+                <input type = "text" id = "url-field-existing" class = "right-panel-text-field" placeholder = "URL">
+                <input type = "text" id = "document-name-field-existing" class = "right-panel-text-field" placeholder = "Document Name">
+                <button id = "upsert-button-existing" class = "right-panel-button">Upsert</button>
             </div>
 
             <!-- content for the New tab (create a new generator/corpus) -->
             <div id = "new" class = "tab-content" style = "display: none;">
                 <input type = "text" id = "new-corpus-name" class = "right-panel-text-field" placeholder = "Corpus Name">
                 <button id = "create-button" class = "right-panel-button">Create</button>
-                <input type = "text" id = "url-field" class = "right-panel-text-field" placeholder = "URL">
-                <input type = "text" id = "document-name-field" class = "right-panel-text-field" placeholder = "Document Name">
-                <button id = "upsert-button" class = "right-panel-button">Upsert</button>
+                <input type = "text" id = "url-field-new" class = "right-panel-text-field" placeholder = "URL">
+                <input type = "text" id = "document-name-field-new" class = "right-panel-text-field" placeholder = "Document Name">
+                <button id = "upsert-button-new" class = "right-panel-button">Upsert</button>
             </div>
 
             <!-- content for the API Key tab (just for storing/updating the key) -->
@@ -169,11 +169,42 @@
          * Given a URL and document name, we use read the HTML content, chunkify
          * it, and upsert those chunks to our vector DB
          */
-        function upsert_document() {
-            var button = document.getElementById("upsert-button");
+        function upsert_document_new() {
+            var button = document.getElementById("upsert-button-new");
             button.classList.add("active");
-            var url = document.getElementById("url-field").value;
-            var document_name = document.getElementById("document-name-field").value;
+            var url = document.getElementById("url-field-new").value;
+            var document_name = document.getElementById("document-name-field-new").value;
+            if (url != "" && document_name != "") {
+                var payload = {
+                    url: url,
+                    doc_title: document_name
+                };
+                fetch(
+                    "http://127.0.0.1:8000/upsert_document",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                )
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    button.classList.remove("active");
+                });
+            } else {
+                alert("Error upserting: Juissie needs both a URL and document title to upsert");
+                button.classList.remove("active");
+            }
+        }
+
+        function upsert_document_existing() {
+            var button = document.getElementById("upsert-button-existing");
+            button.classList.add("active");
+            var url = document.getElementById("url-field-existing").value;
+            var document_name = document.getElementById("document-name-field-existing").value;
             if (url != "" && document_name != "") {
                 var payload = {
                     url: url,
@@ -286,9 +317,19 @@
                 }
             });
         
-        document.getElementById("upsert-button")
-            .addEventListener("click", upsert_document);
-        document.getElementById("document-name-field")
+        document.getElementById("upsert-button-new")
+            .addEventListener("click", upsert_document_new);
+        document.getElementById("document-name-field-new")
+            .addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    upsert_document();
+                }
+            });
+        
+        document.getElementById("upsert-button-existing")
+            .addEventListener("click", upsert_document_existing);
+        document.getElementById("document-name-field-existing")
             .addEventListener("keypress", function(event) {
                 if (event.key === "Enter") {
                     event.preventDefault();

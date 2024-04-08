@@ -33,7 +33,7 @@ function request_handler(request::HTTP.Request)
 
     method = request.method
     target = request.target
-    
+
     # our internal API logic is written in Julia, so this
     # routes the request to the appropriate API function
     # in API.jl
