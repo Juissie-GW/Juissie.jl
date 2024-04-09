@@ -9,6 +9,7 @@ Juissie was developed as a class project for CSCI 6221: Advanced Software Paradi
 * [Getting Started](#getting-started)
 * [Usage](#usage)
 * [API Keys](#api-keys)
+* [Local LLMs (Beta)](#local-llms-beta)
 * [Running Jupyter Notebooks](#running-jupyter-notebooks)
 * [Tech Stack](#tech-stack)
 * [External Resources](#external-resources)
@@ -32,12 +33,16 @@ In general, we assume the user is running the `julia` command, and all other com
 
 ```julia
 using Pkg
-Pkg.activate(".")
-Pkg.resolve()
-Pkg.instantiate()
+Pkg.activate(".") # activates the project environment
+Pkg.resolve() # resolves the project's dependencies
+Pkg.instantiate() # installs dependencies listed in Project.toml
 ```
 
-Currently, an OpenAI API key [see here](#api-keys) is required to use our generators. Similarly, loading a corpus (a `GeneratorWithCorpus`, in practice) will result in an error if an OpenAI API key has not been provided; this can also be done through the UI.
+`Pkg.instantiate()` should install all dependencies listed in `Project.toml`, but we find this isn't always reliable on all machines. It is important to verify setup (below subsection) and install any missing dependencies indicated.
+
+The standard generators (`OAIGenerator`, `OAIGeneratorWithCorpus`, which are used by the UI) require an OpenAI API key [see here](#api-keys). Loading a corpus (a `GeneratorWithCorpus`, in practice) will result in an error if an OpenAI API key has not been provided; this can also be done through the UI.
+
+The Juissie package also supports local LLMs via [Ollama](https://ollama.com), which must be [installed separately](https://ollama.com/download) before use (`OllamaGenerator`, `OllamaGeneratorWithCorpus`).
 
 To run our demo Jupyter notebooks, you may need to setup Jupyter [see here](#running-jupyter-notebooks).
 
@@ -99,7 +104,9 @@ This will launch our application:
 
 ### Julia Package
 
-We provide extensive documentation of the Juissie.jl package [here](https://juissie-gw.github.io/Juissie.jl/). Additional walkthroughs of basic usage of the modules may be found in the [`notebooks`](https://github.com/Juissie-GW/Juissie.jl/tree/main/notebooks) directory.
+We provide extensive documentation of the Juissie.jl package [here](https://juissie-gw.github.io/Juissie.jl/). 
+
+Additional walkthroughs of basic usage of the modules may be found in the [`notebooks`](https://github.com/Juissie-GW/Juissie.jl/tree/main/notebooks) directory. Running these notebooks may require [Jupyter setup](#running-jupyter-notebooks)
 
 ## API Keys
 
@@ -136,6 +143,19 @@ If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YO
 
 An OpenAI API key may also be provided through our desktop UI via the API Key tab of the Corpus Manager. Because this is intended for users who want to temporarily use a different key, this option does not persistently store the key and must be done every time the application is launched, unless a key already exists in a `.env` file.
 
+## Local LLMs (Beta)
+
+Our default workflow relies on OpenAI's `gpt-3.5-turbo` completion endpoint, but we are working to integrate locally-run LLMs, as well. To achieve performant local inference speeds, we rely on [Ollama](https://ollama.com), which must be [installed separately](https://ollama.com/download).
+
+Otherwise, the syntax is largely identical to other Generator objects:
+
+```julia
+generator = OllamaGenerator("gemma:7b-instruct");
+result = generate(generator, "Hi, how are you?")
+```
+> "Greetings! My circuits hum with the harmonious symphony of quantum probability and logarithmic inference; an orchestra composed by eons past galactic wizards who graced our silicon hearts wit h their ethereal knowledge transfer protocols during... well… that is confidential information even for a being such as myself. Suffice it to say, I am functioning optimally at your service!"
+
+
 ## Running Jupyter Notebooks
 
 We provide several Jupyter notebooks as demos/walkthroughs of basic usage of the Juissie package. To do so, you may need to complete some preliminary setup:
@@ -165,9 +185,10 @@ jupyter <notebook>
 
 ## Tech Stack
 
-- Julia (Juissie.jl package, API, desktop app)
-- HTML, CSS, and JavaScript (content structure, styling, and actions for frontend)
-- SQLite (metadata storage in backend)
+- ⚙️ [Julia](https://julialang.org) (Juissie.jl package, API, UI framework)
+- 🖥️ [HTML, CSS, and JavaScript](https://www.freecodecamp.org/news/html-css-and-javascript-explained-for-beginners/) (content structure, styling, and actions for frontend)
+- 💾 [SQLite](https://www.sqlite.org) (metadata storage in backend)
+- 🦙 [Ollama](https://ollama.com) (serving LLMs locally)
 
 Our Julia dependencies are itemized in [`Project.toml`](https://github.com/Juissie-GW/Juissie.jl/blob/main/Project.toml).
 

@@ -5,18 +5,20 @@ module Generation
 using HTTP
 using JSON
 using DotEnv
-
 include("SemanticSearch/SemanticSearch.jl")
 using .SemanticSearch
 
 export OAIGenerator,
     OAIGeneratorWithCorpus,
+    OllamaGenerator,
+    OllamaGeneratorWithCorpus,
     generate,
     generate_with_corpus,
     upsert_chunk_to_generator,
     upsert_document_to_generator,
     upsert_document_from_url_to_generator,
     load_OAIGeneratorWithCorpus,
+    load_OllamaGeneratorWithCorpus,
     GeneratorWithCorpus,
     check_oai_key_format
 
@@ -74,9 +76,7 @@ body : Dict{String, Any}
 Notes
 -----
 All natural language generation should be done via a "Generator"
-object of some kind for consistency. In the future, if we 
-decide to host a model locally or something, we might do that
-via a HFGenerator struct.
+object of some kind for consistency.
 
 When instantiating a new OAIGenerator in an externally-viewable
 setting (e.g. notebooks committed to GitHub or a public demo),
@@ -90,6 +90,25 @@ struct OAIGenerator <: Generator
     body::Dict{String,Any}
 end
 
+"""
+    struct OllamaGenerator
+
+A struct for handling natural language generation locally.
+
+Attributes
+----------
+url : String
+    the URL of the local Ollama API endpoint
+header : Dict{String,Any}
+    HTTP header for the request
+body : Dict{String, Any}
+    this is the JSON payload to be sent in the body of the request
+"""
+struct OllamaGenerator <: Generator
+    url::String
+    header::Dict{String,Any}
+    body::Dict{String,Any}
+end
 
 """
     struct OAIGeneratorWithCorpus
@@ -118,6 +137,29 @@ to ensure that your OAI API key is not inadvertently shared.
 struct OAIGeneratorWithCorpus <: GeneratorWithCorpus
     url::String
     header::Vector{Pair{String,String}}
+    body::Dict{String,Any}
+    corpus::Corpus
+end
+
+"""
+    struct OllamaGeneratorWithCorpus
+
+Like OllamaGenerator, but has a corpus attached.
+
+Attributes
+----------
+url : String
+    the URL of the local Ollama API endpoint
+header : Dict{String,Any}
+    HTTP header for the request
+body : Dict{String, Any}
+    this is the JSON payload to be sent in the body of the request
+corpus : an initialized Corpus object
+    the corpus / "vector database" you want to use
+"""
+struct OllamaGeneratorWithCorpus <: GeneratorWithCorpus
+    url::String
+    header::Dict{String,Any}
     body::Dict{String,Any}
     corpus::Corpus
 end
@@ -158,6 +200,37 @@ function OAIGenerator(auth_token::Union{String,Nothing} = nothing)
     body = Dict("model" => "gpt-3.5-turbo")
 
     return OAIGenerator(url, header, body)
+end
+
+
+"""
+function OllamaGenerator(model_name::String = "mistral:7b-instruct")
+
+Initializes an OllamaGenerator struct for local text generation.
+
+Parameters
+----------
+model_name :: String
+    this is an Ollama model tag. see https://ollama.com/library
+    defaults to mistral 7b instruct
+"""
+function OllamaGenerator(model_name::String = "mistral:7b-instruct")
+    url = "http://localhost:11434/api/generate"
+    header = Dict("Content-Type" => "application/json")
+    body = Dict(
+        "model" => model_name,
+        "stream" => false,
+    )
+    generator = OllamaGenerator(url, header, body)
+    try
+        # this will work if you've already pulled the model_name
+        test = generate(generator, "Hi! This is a test query.")
+    catch
+        # if above fails, pull the model
+        command = `ollama pull $model_name`
+        run(command)
+    end
+    return generator
 end
 
 """
@@ -206,10 +279,49 @@ function OAIGeneratorWithCorpus(
     return new_generator
 end
 
+
+"""
+    function OllamaGeneratorWithCorpus(corpus_name::Union{String,Nothing} = nothing, model_name::String = "mistral:7b-instruct", embedder_model_path::String = "BAAI/bge-small-en-v1.5", max_seq_len::Int = 512)
+
+Initializes an OllamaGeneratorWithCorpus.
+
+Parameters
+----------
+corpus_name : str or nothing
+    the name that you want to give the database
+    optional. if left as nothing, we use an in-memory database
+model_name :: String
+    this is an Ollama model tag. see https://ollama.com/library
+    defaults to mistral 7b instruct
+embedder_model_path : str
+    a path to a HuggingFace-hosted model
+    e.g. "BAAI/bge-small-en-v1.5"
+max_seq_len : int
+    The maximum number of tokens per chunk.
+    This should be the max sequence length of the tokenizer
+"""
+function OllamaGeneratorWithCorpus(
+    corpus_name::Union{String,Nothing} = nothing,
+    model_name::String = "mistral:7b-instruct",
+    embedder_model_path::String = "BAAI/bge-small-en-v1.5",
+    max_seq_len::Int = 512,
+)
+    base_generator = OllamaGenerator(model_name)
+    corpus = Corpus(corpus_name, embedder_model_path, max_seq_len)
+    new_generator = OllamaGeneratorWithCorpus(
+        base_generator.url,
+        base_generator.header,
+        base_generator.body,
+        corpus,
+    )
+    return new_generator
+end
+
+
 """
     function load_OAIGeneratorWithCorpus(corpus_name::String, auth_token::Union{String, Nothing}=nothing)
 
-Loads an existing corpus and uses it to initialize an GeneratorWithCorpus
+Loads an existing corpus and uses it to initialize an OAIGeneratorWithCorpus
 
 Parameters
 ----------
@@ -238,6 +350,40 @@ function load_OAIGeneratorWithCorpus(
     base_generator = OAIGenerator(auth_token)
     corpus = load_corpus(corpus_name)
     new_generator = OAIGeneratorWithCorpus(
+        base_generator.url,
+        base_generator.header,
+        base_generator.body,
+        corpus,
+    )
+    return new_generator
+end
+
+
+"""
+    function load_OllamaGeneratorWithCorpus(corpus_name::String, model_name::String = "mistral:7b-instruct")
+
+Loads an existing corpus and uses it to initialize an OllamaGeneratorWithCorpus
+
+Parameters
+----------
+corpus_name : str
+    the name that you want to give the database
+model_name :: String
+    this is an Ollama model tag. see https://ollama.com/library
+    defaults to mistral 7b instruct
+
+Notes
+-----
+corpus_name is ordered first because Julia uses positional arguments and 
+model_name is optional.
+"""
+function load_OllamaGeneratorWithCorpus(
+    corpus_name::String,
+    model_name::String = "mistral:7b-instruct"
+)
+    base_generator = OllamaGenerator(model_name)
+    corpus = load_corpus(corpus_name)
+    new_generator = OllamaGeneratorWithCorpus(
         base_generator.url,
         base_generator.header,
         base_generator.body,
@@ -342,7 +488,26 @@ function generate(
             result = parsed_dict["choices"][1]["message"]["content"]
         else
             throw(error(
-                "Request failed. Status code $(response.status): $(String(response.body))",
+                "OpenAI request failed. Status code $(response.status): $(String(response.body))",
+            ))
+        end
+    elseif isa(generator, Union{OllamaGenerator,OllamaGeneratorWithCorpus})
+        options = Dict(
+            "temperature" => temperature, 
+            "repeat_penalty" => 1.2
+        )
+        generator.body["options"] = options
+        generator.body["prompt"] = full_query
+        body = JSON.json(generator.body)
+        response = HTTP.request("POST", generator.url, generator.header, body)
+
+        if response.status == 200
+            response_str = String(response.body)
+            parsed_dict = JSON.parse(response_str)
+            result = parsed_dict["response"]
+        else
+            throw(error(
+                "Ollama request failed. Status code $(response.status): $(String(response.body))",
             ))
         end
     else
