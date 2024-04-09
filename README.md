@@ -10,8 +10,10 @@ Juissie was developed as a class project for CSCI 6221: Advanced Software Paradi
 * [Usage](#usage)
 * [API Keys](#api-keys)
 * [Running Jupyter Notebooks](#running-jupyter-notebooks)
+* [Tech Stack](#tech-stack)
 * [External Resources](#external-resources)
 * [Contact](#contact)
+
 
 ## Getting Started
 
@@ -35,7 +37,9 @@ Pkg.resolve()
 Pkg.instantiate()
 ```
 
-To use our generators, you may need an OpenAI API key [see here](#api-keys). To run our demo Jupyter notebooks, you may need to setup Jupyter [see here](#running-jupyter-notebooks).
+Currently, an OpenAI API key [see here](#api-keys) is required to use our generators. Similarly, loading a corpus (a `GeneratorWithCorpus`, in practice) will result in an error if an OpenAI API key has not been provided; this can also be done through the UI.
+
+To run our demo Jupyter notebooks, you may need to setup Jupyter [see here](#running-jupyter-notebooks).
 
 ### Verify Setup
 
@@ -95,7 +99,7 @@ This will launch our application:
 
 ### Julia Package
 
-Documentation TODO. Walkthroughs of module basic usage may be found in the `notebooks` directory.
+We provide extensive documentation of the Juissie.jl package [here](https://juissie-gw.github.io/Juissie.jl/). Additional walkthroughs of basic usage of the modules may be found in the [`notebooks`](https://github.com/Juissie-GW/Juissie.jl/tree/main/notebooks) directory.
 
 ## API Keys
 
@@ -130,6 +134,8 @@ api_key = cfg["OAI_KEY"]
 Note that DotEnv looks for `.env` in the *current* directory, i.e. that of where you called `julia` from. 
 If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YOUR_PATH_HERE)`. If you are invoking Juissie from the root directory of this repo (typical), this means the `.env` should be placed there.
 
+An OpenAI API key may also be provided through our desktop UI via the API Key tab of the Corpus Manager. Because this is intended for users who want to temporarily use a different key, this option does not persistently store the key and must be done every time the application is launched, unless a key already exists in a `.env` file.
+
 ## Running Jupyter Notebooks
 
 We provide several Jupyter notebooks as demos/walkthroughs of basic usage of the Juissie package. To do so, you may need to complete some preliminary setup:
@@ -156,6 +162,14 @@ jupyter <notebook>
 ```
 
 4. When you create a new notebook, select a Julia kernel.
+
+## Tech Stack
+
+- Julia (Juissie.jl package, API, desktop app)
+- HTML, CSS, and JavaScript (content structure, styling, and actions for frontend)
+- SQLite (metadata storage in backend)
+
+Our Julia dependencies are itemized in [`Project.toml`](https://github.com/Juissie-GW/Juissie.jl/blob/main/Project.toml).
 
 ## External Resources
 
