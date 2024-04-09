@@ -19,11 +19,14 @@ export Corpus,
 using .Generation
 export OAIGenerator,
     OAIGeneratorWithCorpus,
+    OllamaGenerator,
+    OllamaGeneratorWithCorpus
     generate,
     generate_with_corpus,
     upsert_chunk_to_generator,
     upsert_document_to_generator,
     upsert_document_from_url_to_generator,
-    load_OAIGeneratorWithCorpus
+    load_OAIGeneratorWithCorpus,
+    load_OllamaGeneratorWithCorpus
 
 end
