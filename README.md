@@ -2,7 +2,7 @@
 
 Juissie is a Julia-native semantic query engine. It can be used as a package in software development workflows, or via its desktop user interface.
 
-Juissie was developed as a class project for CSCI 6221: Advanced Software Paradigms at The George Washington University.
+Juissie was developed as a class project for *CSCI 6221: Advanced Software Paradigms* at [The George Washington University](https://cs.engineering.gwu.edu).
 
 https://github.com/Juissie-GW/Juissie.jl/assets/12187602/14fce4a5-8d6e-4108-8a88-8394d5129326
 
@@ -11,7 +11,7 @@ https://github.com/Juissie-GW/Juissie.jl/assets/12187602/14fce4a5-8d6e-4108-8a88
 * [Getting Started](#getting-started)
 * [Usage](#usage)
 * [API Keys](#api-keys)
-* [Local LLMs (Beta)](#local-llms-beta)
+* [Local LLMs](#local-llms)
 * [Running Jupyter Notebooks](#running-jupyter-notebooks)
 * [Tech Stack](#tech-stack)
 * [External Resources](#external-resources)
@@ -99,16 +99,14 @@ Navigate to the root directory of this repository (`Juissie.jl`), enter the foll
 julia src/Frontend.jl
 ```
 
-This will launch our application:
-
-<img src="assets/ui1.png" alt="ui1" width="500"/>
+This will launch our application.
 
 
 ### Julia Package
 
 We provide extensive documentation of the Juissie.jl package [here](https://juissie-gw.github.io/Juissie.jl/). 
 
-Additional walkthroughs of basic usage of the modules may be found in the [`notebooks`](https://github.com/Juissie-GW/Juissie.jl/tree/main/notebooks) directory. Running these notebooks may require [Jupyter setup](#running-jupyter-notebooks)
+We also provide an interactive tutorial notebook in the [`notebooks`](https://github.com/Juissie-GW/Juissie.jl/tree/main/notebooks) directory. This may require [Jupyter setup](#running-jupyter-notebooks).
 
 ## API Keys
 
@@ -145,9 +143,9 @@ If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YO
 
 An OpenAI API key may also be provided through our desktop UI via the API Key tab of the Corpus Manager. Because this is intended for users who want to temporarily use a different key, this option does not persistently store the key and must be done every time the application is launched, unless a key already exists in a `.env` file.
 
-## Local LLMs (Beta)
+## Local LLMs
 
-Our default workflow relies on OpenAI's `gpt-3.5-turbo` completion endpoint, but we are working to integrate locally-run LLMs, as well. To achieve performant local inference speeds, we rely on [Ollama](https://ollama.com), which must be [installed separately](https://ollama.com/download).
+Our default workflow relies on OpenAI's `gpt-3.5-turbo` completion endpoint, but we also support locally-run LLMs via [Ollama](https://ollama.com) (which must be [installed separately](https://ollama.com/download)).
 
 Otherwise, the syntax is largely identical to other Generator objects:
 
