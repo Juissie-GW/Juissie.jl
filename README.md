@@ -106,7 +106,7 @@ This will launch our application.
 
 We provide extensive documentation of the Juissie.jl package [here](https://juissie-gw.github.io/Juissie.jl/). 
 
-We also provide an interactive tutorial notebook in the [`notebooks`](https://github.com/Juissie-GW/Juissie.jl/tree/main/notebooks) directory. This may require [Jupyter setup](#running-jupyter-notebooks).
+We also provide an [interactive tutorial notebook](https://github.com/Juissie-GW/Juissie.jl/blob/main/notebooks/Juissie.jl%20Walkthrough.ipynb) in the `notebooks` directory. This may require [Jupyter setup](#running-jupyter-notebooks).
 
 ## API Keys
 

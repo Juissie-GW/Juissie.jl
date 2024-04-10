@@ -68,11 +68,7 @@ payload : JSON body
 """
 function json_response(code::Int, payload)
     content_type_json = ["Content-Type" => "application/json"]
-    return HTTP.Response(
-        code,
-        content_type_json, 
-        payload
-    )
+    return HTTP.Response(code, content_type_json, payload)
 end
 
 

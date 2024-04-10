@@ -17,7 +17,7 @@ Simple function to return the path to the files subdirectory.
 
 Example Usage
 -------------
-test_bin_path = get_files_path()*"test.bin"
+test_bin_path = get_files_path() * "test.bin"
 """
 function get_files_path()
     CURR_DIR = @__DIR__
@@ -34,7 +34,7 @@ Parameters
 url : String
     the url you want to read
 elements : Array{String}
-    html elements to look for in the web page, e.g. ["h1", "p"].
+    html elements to look for in the web page, e.g. ["h1", "p"]
 
 Notes
 -----
@@ -59,7 +59,7 @@ Uses basic regex to divide a provided text (e.g. paragraph) into sentences.
 Parameters
 ----------
 text : String
-    The text you want to split into sentences.
+    the text you want to split into sentences
 
 Notes
 -----
@@ -88,11 +88,11 @@ This ensures that each chunk can be fully encoded by the embedder.
 Parameters
 ----------
 text : String
-    The text you want to split into chunks.
+    The text you want to split into chunks
 tokenizer : a tokenizer object, e.g. BertTextEncoder
     The tokenizer you will be using
 sequence_length : Int
-    The maximum number of tokens per chunk.
+    the maximum number of tokens per chunk
     Ideally, should correspond to the max sequence length of the tokenizer
 
 Example Usage
