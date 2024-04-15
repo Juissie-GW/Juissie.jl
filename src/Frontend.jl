@@ -39,6 +39,8 @@ function request_handler(request::HTTP.Request)
     # in API.jl
     if method == "GET" && occursin("/corpus_names", target)
         return handle_corpus_names()
+    elseif method == "GET" && occursin("/model_names", target)
+        return handle_model_names()
     elseif method == "POST" && occursin("/load_generator", target)
         gen, response = handle_load_generator(OAI_KEY, request)
         if !isnothing(gen)

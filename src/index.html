@@ -25,7 +25,7 @@
             <div class = "tabs">
                 <button id = "existing-tab-button" class = "tab-button active" onclick = "click_tab('existing')">Existing</button>
                 <button id = "new-tab-button" class = "tab-button" onclick = "click_tab('new')">New</button>
-                <button id = "api-key-button" class = "tab-button" onclick = "click_tab('api-key')">API Key</button>
+                <button id = "llm-button" class = "tab-button" onclick = "click_tab('llm')">LLM</button>
             </div>
 
             <!-- content for the Existing tab (load an existing generator/corpus) -->
@@ -46,8 +46,9 @@
                 <button id = "upsert-button-new" class = "right-panel-button">Upsert</button>
             </div>
 
-            <!-- content for the API Key tab (just for storing/updating the key) -->
-            <div id = "api-key" class = "tab-content" style = "display: none;">
+            <!-- content for the LLM tab -->
+            <div id = "llm" class = "tab-content" style = "display: none;">
+                <select id = "model-name"></select>
                 <input type = "password" id = "api-key-field" class = "right-panel-text-field" placeholder = "OpenAI API Key">
                 <button id = "update-key-button" class = "right-panel-button">Update API Key</button>
             </div>
@@ -72,6 +73,17 @@
             var dropdown = document.getElementById("corpus-name");
             dropdown.innerHTML = "";
             corpus_names.forEach(name => {
+                var corpus = document.createElement("option");
+                corpus.value = name;
+                corpus.textContent = name;
+                dropdown.appendChild(corpus);
+            });
+        }
+
+        function build_model_name_dropdown(model_names) {
+            var dropdown = document.getElementById("model-name");
+            dropdown.innerHTML = "";
+            model_names.forEach(name => {
                 var corpus = document.createElement("option");
                 corpus.value = name;
                 corpus.textContent = name;
@@ -238,11 +250,16 @@
             var button = document.getElementById("load-button");
             button.classList.add("active");
             var corpus_name = document.getElementById("corpus-name").value;
+            var model_name = document.getElementById("model-name").value;
+            var payload = {
+                corpus: corpus_name,
+                model: model_name
+            };
             fetch(
                 "http://127.0.0.1:8000/load_generator",
                 {
                     method: "POST",
-                    body: corpus_name
+                    body: JSON.stringify(payload)
                 }
             )
             .then(response => response.json())
@@ -264,11 +281,16 @@
             var button = document.getElementById("create-button");
             button.classList.add("active");
             var corpus_name = document.getElementById("new-corpus-name").value;
+            var model_name = document.getElementById("model-name").value;
+            var payload = {
+                corpus: corpus_name,
+                model: model_name
+            };
             fetch(
                 "http://127.0.0.1:8000/create_generator",
                 {
                     method: "POST",
-                    body: corpus_name
+                    body: JSON.stringify(payload)
                 }
             )
             .then(response => response.json())
@@ -287,6 +309,10 @@
         fetch("http://127.0.0.1:8000/corpus_names")
             .then(response => response.json())
             .then(data => {build_corpus_dropdown(data.corpus_names);});
+
+        fetch("http://127.0.0.1:8000/model_names")
+            .then(response => response.json())
+            .then(data => {build_model_name_dropdown(data.model_names);});
         
         // execute on button click only
         document.getElementById("load-button")
