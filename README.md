@@ -3,7 +3,6 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/Juissie-GW/Juissie.jl)
 
 
-
 # 🥝 JUISSIE (JUlIa Semantic Search pIpelinE)
 
 Juissie is a Julia-native semantic query engine. It can be used as a package in software development workflows, or via its desktop user interface.
