@@ -30,7 +30,7 @@
 
             <!-- content for the Existing tab (load an existing generator/corpus) -->
             <div id = "existing" class = "tab-content">
-                <select id = "corpus-name"></select>
+                <select id = "corpus-name" class = "right-panel-dropdown"></select>
                 <button id = "load-button" class = "right-panel-button">Load</button>
                 <input type = "text" id = "url-field-existing" class = "right-panel-text-field" placeholder = "URL">
                 <input type = "text" id = "document-name-field-existing" class = "right-panel-text-field" placeholder = "Document Name">
@@ -48,7 +48,7 @@
 
             <!-- content for the LLM tab -->
             <div id = "llm" class = "tab-content" style = "display: none;">
-                <select id = "model-name"></select>
+                <select id = "model-name" class = "right-panel-dropdown"></select>
                 <input type = "password" id = "api-key-field" class = "right-panel-text-field" placeholder = "OpenAI API Key">
                 <button id = "update-key-button" class = "right-panel-button">Update API Key</button>
             </div>
