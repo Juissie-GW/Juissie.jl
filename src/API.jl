@@ -10,6 +10,7 @@ using .Generation
 
 export get_corpus_names,
     handle_corpus_names,
+    handle_model_names,
     handle_load_generator,
     handle_generate,
     handle_create_generator,
@@ -86,6 +87,17 @@ function get_corpus_names()
     return corpus_names_unique
 end
 
+"""
+    function get_model_names()
+
+Finds the names for all the available models from a local file.
+"""
+function get_model_names()
+    fpath = joinpath(dirname(@__FILE__), "model_names.txt")
+    model_names = readlines(fpath)
+    return model_names
+end
+
 
 """
     function handle_corpus_names()
@@ -106,6 +118,24 @@ end
 
 
 """
+    function handle_model_names()
+
+Endpoint logic for pulling all the available model names from local
+    storage
+"""
+function handle_model_names()
+    try
+        model_names = get_model_names()
+        response_dict = Dict("model_names" => model_names)
+        payload = JSON.json(response_dict)
+        return json_response(200, payload)
+    catch e
+        return simple_response(500, "Juissie could not find any available model names: $e")
+    end
+end
+
+
+"""
     function handle_load_generator(OAI_KEY::Union{String, Nothing}, request::HTTP.Request)
 
 Endpoint logic for loading an existing OAIGeneratorWithCorpus from local
@@ -120,9 +150,17 @@ OAI_KEY : Union{String, Nothing}
 """
 function handle_load_generator(OAI_KEY::Union{String, Nothing}, request::HTTP.Request)
     try
-        corpus_name = String(request.body)
-        generator = load_OAIGeneratorWithCorpus(corpus_name, OAI_KEY)
-        return generator, simple_response(200, "Juissie successfully loaded the on-disk GeneratorWithCorpus '$corpus_name'")
+        response_dict = JSON.parse(String(request.body))
+        corpus_name = response_dict["corpus"]
+        model_name = response_dict["model"]
+
+        if occursin("openai", model_name)
+            generator = load_OAIGeneratorWithCorpus(corpus_name, OAI_KEY)
+        else
+            generator = load_OllamaGeneratorWithCorpus(corpus_name, model_name)
+        end
+
+        return generator, simple_response(200, "Juissie successfully loaded the on-disk GeneratorWithCorpus '$corpus_name' with LLM $model_name")
     catch e
         return nothing, simple_response(500, "Juissie could not load the GeneratorWithCorpus: $e")
     end
@@ -144,7 +182,19 @@ generator : GeneratorWithCorpus
 function handle_generate(generator::GeneratorWithCorpus, request::HTTP.Request)
     try
         query = String(request.body)
-        result, idx_list, doc_names, chunks = generate_with_corpus(generator, query, 10, 0.7)
+
+        if isa(generator, Union{OAIGenerator,OAIGeneratorWithCorpus})
+            k = 10
+        else
+            k = 3
+        end
+
+        result, idx_list, doc_names, chunks = generate_with_corpus(
+            generator, 
+            query, 
+            k,
+            0.7
+        )
         response_dict = Dict(
             "result" => result,
             "doc_names" => unique(doc_names)
@@ -170,13 +220,23 @@ OAI_KEY : Union{String, Nothing}
 """
 function handle_create_generator(OAI_KEY::Union{String, Nothing}, request::HTTP.Request)
     try
-        corpus_name = String(request.body)
+        response_dict = JSON.parse(String(request.body))
+        corpus_name = response_dict["corpus"]
         if corpus_name == ""
-            generator = OAIGeneratorWithCorpus(nothing, OAI_KEY)
-            return generator, simple_response(200, "Juissie successfully created an in-memory GeneratorWithCorpus")
-        else
+            corpus_name = nothing
+        end
+        model_name = response_dict["model"]
+
+        if occursin("openai", model_name)
             generator = OAIGeneratorWithCorpus(corpus_name, OAI_KEY)
-            return generator, simple_response(200, "Juissie successfully created on-disk GeneratorWithCorpus '$corpus_name'")
+        else
+            generator = OllamaGeneratorWithCorpus(corpus_name, model_name)
+        end
+
+        if corpus_name == ""
+            return generator, simple_response(200, "Juissie successfully created an in-memory GeneratorWithCorpus with LLM $model_name")
+        else
+            return generator, simple_response(200, "Juissie successfully created on-disk GeneratorWithCorpus '$corpus_name' with LLM $model_name")
         end
     catch e
         return nothing, simple_response(500, "Juissie could not creat the GeneratorWithCorpus: $e")

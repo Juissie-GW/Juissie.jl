@@ -1,4 +1,7 @@
 [![CC BY-NC 4.0][cc-by-nc-shield]][cc-by-nc]
+![GitHub Repo stars](https://img.shields.io/github/stars/Juissie-GW/Juissie.jl)
+![GitHub top language](https://img.shields.io/github/languages/top/Juissie-GW/Juissie.jl)
+
 
 # 🥝 JUISSIE (JUlIa Semantic Search pIpelinE)
 

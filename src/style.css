@@ -113,7 +113,8 @@ body {
 }
 
 /* existing corpus dropdown */
-#corpus-name {
+/* #corpus-name */
+.right-panel-dropdown {
     font-family: var(--default-font);
     font-size: var(--default-font-size);
     padding: var(--small-px);
