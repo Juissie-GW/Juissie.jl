@@ -9,7 +9,8 @@ Juissie is a Julia-native semantic query engine. It can be used as a package in 
 
 Juissie was developed as a class project for *CSCI 6221: Advanced Software Paradigms* at [The George Washington University](https://cs.engineering.gwu.edu).
 
-https://github.com/Juissie-GW/Juissie.jl/assets/12187602/14fce4a5-8d6e-4108-8a88-8394d5129326
+https://github.com/Juissie-GW/Juissie.jl/assets/12187602/3a8eb890-587a-4066-b171-8c0ec3462537
+
 
 ## Table of Contents
 * [Table of Contents](#table-of-contents)
@@ -124,9 +125,9 @@ Juissie's default generator requires an OpenAI API key. This can be provided man
 2. Set up billing information (each query has a small cost) [here](https://platform.openai.com/account/billing/payment-methods).
 3. Create a new secret key [here](https://platform.openai.com/api-keys).
 
-### Managing API Keys
+### Managing API Keys Locally
 
-Secure management of secret keys is important. Every user should create a `.env` file in the project root where they add their API key(s), e.g.:
+Users may create a `.env` file in the project root where they add their API key(s), e.g.:
 ```bash
 OAI_KEY=ABC123
 ```
@@ -153,7 +154,9 @@ An OpenAI API key may also be provided through our desktop UI via the API Key ta
 
 Our default workflow relies on OpenAI's `gpt-3.5-turbo` completion endpoint, but we also support locally-run LLMs via [Ollama](https://ollama.com) (which must be [installed separately](https://ollama.com/download)).
 
-Otherwise, the syntax is largely identical to other Generator objects:
+https://github.com/Juissie-GW/Juissie.jl/assets/12187602/3dc58750-bfa5-4a5f-91d2-ff43e3c20adf
+
+The syntax is largely identical to other Generator objects:
 
 ```julia
 generator = OllamaGenerator("gemma:7b-instruct");
