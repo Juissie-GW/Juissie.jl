@@ -5,7 +5,7 @@
 
 # 🥝 JUISSIE (JUlIa Semantic Search pIpelinE)
 
-Juissie is a Julia-native semantic query engine. It can be used as a package in software development workflows, or via its desktop user interface. We can support both [commercial](#api-keys) and local [LLMs](#local-llms).
+Juissie is a Julia-native semantic query engine. It can be used as a package in software development workflows, or via its desktop user interface. We can support both [commercial](#api-keys) and [local](#local-llms) LLMs.
 
 Juissie was developed as a class project for *CSCI 6221: Advanced Software Paradigms* at [The George Washington University](https://cs.engineering.gwu.edu).
 
@@ -16,6 +16,7 @@ https://github.com/Juissie-GW/Juissie.jl/assets/12187602/3a8eb890-587a-4066-b171
 * [Table of Contents](#table-of-contents)
 * [Getting Started](#getting-started)
 * [Usage](#usage)
+* [Documentation](#documentation)
 * [API Keys](#api-keys)
 * [Local LLMs](#local-llms)
 * [Running Jupyter Notebooks](#running-jupyter-notebooks)
@@ -149,6 +150,10 @@ Note that DotEnv looks for `.env` in the *current* directory, i.e. that of where
 If `.env` is in a different path, you have to provide it, e.g. `DotEnv.config(YOUR_PATH_HERE)`. If you are invoking Juissie from the root directory of this repo (typical), this means the `.env` should be placed there.
 
 An OpenAI API key may also be provided through our desktop UI via the API Key tab of the Corpus Manager. Because this is intended for users who want to temporarily use a different key, this option does not persistently store the key and must be done every time the application is launched, unless a key already exists in a `.env` file.
+
+## Documentation
+
+We provide a brief API reference [here](https://juissie-gw.github.io/Juissie.jl/#Functions).
 
 ## Local LLMs
 
